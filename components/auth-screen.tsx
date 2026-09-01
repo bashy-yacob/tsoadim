@@ -8,11 +8,12 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { signUpWithEmail, signInWithEmail, signInWithGoogle } from "@/lib/auth";
 
 export function AuthScreen() {
   const router = useRouter();
+  const submitLockRef = useRef(false);
   const [mode, setMode] = useState<"signup" | "signin">("signup");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,6 +23,12 @@ export function AuthScreen() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting || submitLockRef.current) {
+      return;
+    }
+
+    submitLockRef.current = true;
     setError(null);
     setIsSubmitting(true);
 
@@ -55,16 +62,27 @@ export function AuthScreen() {
       setError("אירעה שגיאה בתהליך");
     } finally {
       setIsSubmitting(false);
+      submitLockRef.current = false;
     }
   };
 
   const handleGoogleSignIn = async () => {
+    if (isSubmitting || submitLockRef.current) {
+      return;
+    }
+
+    submitLockRef.current = true;
     setError(null);
     setIsSubmitting(true);
-    const result = await signInWithGoogle();
-    if (!result.success) {
-      setError(result.error || "נכשלה ההתחברות עם Google");
+
+    try {
+      const result = await signInWithGoogle();
+      if (!result.success) {
+        setError(result.error || "נכשלה ההתחברות עם Google");
+      }
+    } finally {
       setIsSubmitting(false);
+      submitLockRef.current = false;
     }
   };
 

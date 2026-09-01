@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>צועדים - כל מסכי האפליקציה</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.46.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --surface-0:#FAF9F6; --surface-1:#FFFFFF; --surface-2:#F5F3EF;
+    --border:#E5E1D8; --border-strong:#C9C3B5; --border-accent:#E8A78F;
+    --text-primary:#1F1B16; --text-secondary:#6B6459; --text-muted:#9C9585; --text-accent:#B94A26;
+    --bg-accent:#F5C4B3; --fill-accent:#D85A30;
+    --fill-primary:#D85A30; --on-primary:#FFF9F5;
+    --fill-brand:#D85A30; --on-brand:#FFF9F5;
+    --bg-success:#DCF3E7; --text-success:#1D7A4C;
+    --bg-warning:#FDEACB; --text-warning:#8A5A05;
+    --bg-danger:#FBE2E1; --text-danger:#B3261E;
+    --bg-pro:#F4E4FF; --text-pro:#6B3FA0;
+    --font-sans:-apple-system, 'Segoe UI', Arial, sans-serif;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{background:#EFEBE3; font-family:var(--font-sans); margin:0; padding:2rem 1rem 5rem; color:var(--text-primary);}
+  h1.page-title{text-align:center; font-size:26px; font-weight:600; margin-bottom:6px;}
+  p.page-sub{text-align:center; color:var(--text-secondary); margin-top:0; margin-bottom:2rem; font-size:14px;}
+  nav.toc{max-width:900px; margin:0 auto 3rem; background:var(--surface-1); border-radius:16px; padding:1rem 1.5rem; box-shadow:0 2px 10px rgba(0,0,0,0.05); direction:rtl;}
+  nav.toc p{font-size:13px; color:var(--text-secondary); margin:0 0 8px; font-weight:600;}
+  nav.toc a{display:inline-block; font-size:13px; color:var(--text-accent); text-decoration:none; margin:0 4px 6px; padding:4px 10px; background:var(--bg-accent); border-radius:20px;}
+  section.group{max-width:1200px; margin:0 auto 3rem;}
+  section.group > h2{font-size:18px; font-weight:600; text-align:center; margin-bottom:4px; padding-top:1.5rem; border-top:1px solid var(--border-strong);}
+  section.group > p.desc{text-align:center; color:var(--text-secondary); font-size:13px; margin-top:0; margin-bottom:1.5rem;}
+  .grid{display:flex; flex-wrap:wrap; justify-content:center; gap:28px;}
+  .frame{width:380px;}
+  .frame .cap{text-align:center; font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:10px;}
+  .frame .screen{background:var(--surface-1); border-radius:28px; box-shadow:0 8px 24px rgba(0,0,0,0.08); overflow:hidden; border:6px solid #1F1B16;}
+  .screen-inner{padding:1.5rem;}
+  input,select{border:0.5px solid var(--border-strong); border-radius:10px; padding:0.6rem 0.8rem; font-size:14px; font-family:inherit; background:var(--surface-1); color:var(--text-primary);}
+  button{font-family:inherit; cursor:pointer;}
+</style>
+</head>
+<body>
+
+<h1 class="page-title">צועדים 🔥</h1>
+<p class="page-sub">כל מסכי האפליקציה שתוכננו בשיחה - גרסה סופית + חקירות עיצוב</p>
+
+<nav class="toc">
+  <p>קפיצה מהירה:</p>
+  <a href="#final">מסכים סופיים</a>
+  <a href="#login">הרשמה</a>
+  <a href="#dashboard">דשבורד</a>
+  <a href="#newgoal">יעד חדש</a>
+  <a href="#goaldetail">יעד בודד</a>
+  <a href="#timer">טיימר</a>
+  <a href="#leaderboard">לוח מנצחים</a>
+  <a href="#settings">הגדרות</a>
+  <a href="#landing">דף נחיתה</a>
+  <a href="#exploration">חקירת עיצוב</a>
+</nav>
+
+<!-- ================= FINAL SCREENS ================= -->
+<section class="group" id="final">
+  <h2>1. מסכים סופיים - עיצוב קורל/ענבר עם נקודות</h2>
+  <p class="desc">הכיוון העיצובי שנבחר בסוף התהליך</p>
+  <div class="grid">
+
+    <!-- Login -->
+    <div class="frame" id="login">
+      <p class="cap">הרשמה / התחברות</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="text-align:center; margin-bottom:1.75rem;">
+          <div style="width:56px;height:56px;border-radius:16px;background:var(--bg-accent);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-target-arrow" style="font-size:28px;color:var(--text-accent);"></i>
+          </div>
+          <p style="font-size:18px;font-weight:500;margin:0;">בואו נתחיל להתקדם</p>
+          <p style="font-size:13px;color:var(--text-secondary);margin:4px 0 0;">רשמו יעדים, עקבו אחרי התקדמות, חגגו הישגים</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:1.25rem;background:var(--surface-2);border-radius:var(--radius);padding:3px;">
+          <button style="flex:1;background:var(--surface-1);border:none;border-radius:6px;padding:0.55rem;font-size:13px;font-weight:500;">הרשמה</button>
+          <button style="flex:1;background:transparent;border:none;border-radius:6px;padding:0.55rem;font-size:13px;color:var(--text-secondary);">התחברות</button>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">שם מלא</p>
+        <input type="text" placeholder="בשי קליין" style="width:100%;margin-bottom:1rem;">
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">אימייל</p>
+        <input type="email" placeholder="name@example.com" style="width:100%;margin-bottom:1rem;">
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">סיסמה</p>
+        <input type="password" placeholder="לפחות 8 תווים" style="width:100%;margin-bottom:1.5rem;">
+        <button style="width:100%;background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:var(--radius);padding:0.8rem;margin-bottom:1rem;">
+          <span style="font-size:14px;font-weight:500;">יצירת חשבון</span>
+        </button>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+          <div style="flex:1;height:0.5px;background:var(--border);"></div>
+          <span style="font-size:12px;color:var(--text-muted);">או</span>
+          <div style="flex:1;height:0.5px;background:var(--border);"></div>
+        </div>
+        <button style="width:100%;background:transparent;border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:0.8rem;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <i class="ti ti-brand-google" style="font-size:18px;"></i>
+          <span style="font-size:14px;">המשך עם Google</span>
+        </button>
+      </div></div>
+    </div>
+
+    <!-- Dashboard with points (final) -->
+    <div class="frame" id="dashboard">
+      <p class="cap">דשבורד ראשי (סופי)</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+          <p style="font-size:20px;font-weight:500;margin:0;">היי בשי 👋</p>
+          <div style="display:flex;align-items:center;gap:8px;background:#FAC775;border-radius:20px;padding:5px 10px 5px 6px;">
+            <span style="width:22px;height:22px;border-radius:50%;background:#EF9F27;display:flex;align-items:center;justify-content:center;">
+              <i class="ti ti-bolt" style="font-size:13px;color:#412402;"></i>
+            </span>
+            <span style="font-size:13px;font-weight:500;color:#412402;">890</span>
+          </div>
+        </div>
+        <div style="background:#F0997B;border-radius:20px;padding:1.25rem;margin-bottom:1.25rem;">
+          <p style="font-size:12px;color:#4A1B0C;opacity:0.85;margin:0 0 4px;font-weight:500;">רצף נוכחי</p>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-size:40px;font-weight:500;color:#4A1B0C;">12</span>
+            <span style="font-size:15px;color:#4A1B0C;">ימים ברצף 🔥</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--surface-2);border-radius:16px;padding:0.9rem 1rem;display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:50%;background:conic-gradient(#D85A30 0% 65%, #F5EEE8 65% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#D85A30;">65%</div>
+            </div>
+            <div style="flex:1;">
+              <p style="font-size:14px;font-weight:500;margin:0;">לרוץ 5 ק"מ</p>
+              <p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">כמעט שם, תמשיך!</p>
+            </div>
+            <span style="font-size:11px;color:#BA7517;font-weight:500;">+120</span>
+          </div>
+          <div style="background:var(--surface-2);border-radius:16px;padding:0.9rem 1rem;display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:50%;background:#FAC775;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="ti ti-clock" style="font-size:20px;color:#633806;"></i>
+            </div>
+            <div style="flex:1;">
+              <p style="font-size:14px;font-weight:500;margin:0;">אימון יומי - 10 דק'</p>
+              <p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">רצף אש, אל תעצור!</p>
+            </div>
+            <span style="font-size:11px;color:#BA7517;font-weight:500;">+10/יום</span>
+          </div>
+        </div>
+        <button style="width:100%;margin-top:1.25rem;background:#D85A30;color:#FAECE7;border:none;border-radius:16px;padding:0.9rem;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <i class="ti ti-plus" style="font-size:18px;"></i> יעד חדש
+        </button>
+      </div></div>
+    </div>
+
+    <!-- New goal form -->
+    <div class="frame" id="newgoal">
+      <p class="cap">יצירת יעד חדש</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+          <i class="ti ti-x" style="font-size:20px;color:var(--text-secondary);"></i>
+          <p style="font-size:15px;font-weight:500;margin:0;">יעד חדש</p>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 8px;">סוג היעד</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;">
+          <div style="background:var(--bg-accent);border:2px solid var(--border-accent);border-radius:var(--radius);padding:0.75rem 0.5rem;text-align:center;">
+            <i class="ti ti-target-arrow" style="font-size:20px;color:var(--text-accent);"></i>
+            <p style="font-size:12px;margin:4px 0 0;color:var(--text-accent);font-weight:500;">כמותי</p>
+          </div>
+          <div style="background:var(--surface-2);border:0.5px solid var(--border);border-radius:var(--radius);padding:0.75rem 0.5rem;text-align:center;">
+            <i class="ti ti-flame" style="font-size:20px;color:var(--text-secondary);"></i>
+            <p style="font-size:12px;margin:4px 0 0;color:var(--text-secondary);">סטריק</p>
+          </div>
+          <div style="background:var(--surface-2);border:0.5px solid var(--border);border-radius:var(--radius);padding:0.75rem 0.5rem;text-align:center;">
+            <i class="ti ti-flag" style="font-size:20px;color:var(--text-secondary);"></i>
+            <p style="font-size:12px;margin:4px 0 0;color:var(--text-secondary);">אבן דרך</p>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">שם היעד</p>
+        <input type="text" placeholder='לדוגמה: לרוץ 5 ק"מ' style="width:100%;margin-bottom:1rem;">
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">קטגוריה</p>
+        <select style="width:100%;margin-bottom:1rem;">
+          <option>כושר</option><option>הרגל אישי</option><option>אחר</option>
+        </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">
+          <div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">ערך התחלתי</p>
+            <input type="number" placeholder="0" style="width:100%;">
+          </div>
+          <div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">ערך יעד</p>
+            <input type="number" placeholder="5" style="width:100%;">
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 6px;">יחידה</p>
+        <input type="text" placeholder='ק"מ, ק"ג, ש"ח...' style="width:100%;margin-bottom:1.5rem;">
+        <button style="width:100%;background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:var(--radius);padding:0.8rem;">
+          <span style="font-size:14px;font-weight:500;">יצירת יעד</span>
+        </button>
+      </div></div>
+    </div>
+
+    <!-- Goal detail -->
+    <div class="frame" id="goaldetail">
+      <p class="cap">יעד בודד + גרף</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+          <i class="ti ti-arrow-right" style="font-size:20px;color:var(--text-secondary);"></i>
+          <p style="font-size:15px;font-weight:500;margin:0;">לרוץ 5 ק"מ</p>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:1rem;">
+          <span style="font-size:28px;font-weight:500;">3.25</span>
+          <span style="font-size:14px;color:var(--text-secondary);">מתוך 5 ק"מ (65%)</span>
+        </div>
+        <div style="width:100%;height:8px;background:var(--border);border-radius:4px;margin-bottom:1.5rem;overflow:hidden;">
+          <div style="width:65%;height:100%;background:var(--fill-accent);"></div>
+        </div>
+        <div style="position:relative;height:160px;margin-bottom:1.5rem;"><canvas id="progressChart"></canvas></div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 8px;">היסטוריה</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);">
+            <span style="font-size:13px;color:var(--text-secondary);">28 באוגוסט</span><span style="font-size:13px;font-weight:500;">3.25 ק"מ</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);">
+            <span style="font-size:13px;color:var(--text-secondary);">24 באוגוסט</span><span style="font-size:13px;font-weight:500;">2.8 ק"מ</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+            <span style="font-size:13px;color:var(--text-secondary);">18 באוגוסט</span><span style="font-size:13px;font-weight:500;">1.5 ק"מ</span>
+          </div>
+        </div>
+        <button style="width:100%;background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:var(--radius);padding:0.8rem;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <i class="ti ti-plus" style="font-size:18px;"></i><span style="font-size:14px;font-weight:500;">עדכון התקדמות</span>
+        </button>
+      </div></div>
+    </div>
+
+    <!-- Timer -->
+    <div class="frame" id="timer">
+      <p class="cap">טיימר לסטריק</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
+          <i class="ti ti-x" style="font-size:20px;color:var(--text-secondary);"></i>
+          <p style="font-size:15px;font-weight:500;margin:0;">אימון יומי</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;padding:1.5rem 0 2rem;">
+          <div style="position:relative;width:220px;height:220px;margin-bottom:1.5rem;">
+            <svg width="220" height="220" viewBox="0 0 220 220">
+              <circle cx="110" cy="110" r="96" fill="none" stroke="#F5EEE8" stroke-width="14"/>
+              <circle cx="110" cy="110" r="96" fill="none" stroke="#D85A30" stroke-width="14" stroke-linecap="round" stroke-dasharray="603" stroke-dashoffset="210" transform="rotate(-90 110 110)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <span style="font-size:40px;font-weight:500;">06:32</span>
+              <span style="font-size:13px;color:var(--text-secondary);margin-top:4px;">מתוך 10:00 דקות</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <button style="width:52px;height:52px;border-radius:50%;background:var(--surface-2);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;">
+              <i class="ti ti-player-skip-back" style="font-size:20px;color:var(--text-secondary);"></i>
+            </button>
+            <button style="width:68px;height:68px;border-radius:50%;background:#D85A30;border:none;display:flex;align-items:center;justify-content:center;">
+              <i class="ti ti-player-pause" style="font-size:28px;color:#FAECE7;"></i>
+            </button>
+            <button style="width:52px;height:52px;border-radius:50%;background:var(--surface-2);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;">
+              <i class="ti ti-player-stop" style="font-size:20px;color:var(--text-secondary);"></i>
+            </button>
+          </div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:16px;padding:0.9rem 1rem;display:flex;align-items:center;gap:10px;">
+          <i class="ti ti-flame" style="font-size:20px;color:#D85A30;"></i>
+          <p style="font-size:13px;margin:0;flex:1;">רצף של 12 ימים - כשתסיים, הרצף יעלה אוטומטית</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Leaderboard with group selector (final) -->
+    <div class="frame" id="leaderboard">
+      <p class="cap">לוח מנצחים (סופי - עם selector)</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+          <i class="ti ti-arrow-right" style="font-size:20px;color:var(--text-secondary);"></i>
+          <p style="font-size:15px;font-weight:500;margin:0;flex:1;">לוח מנצחים</p>
+          <span style="background:#FBEAF0;color:#72243E;font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--radius);">פרימיום</span>
+        </div>
+        <select style="width:100%;margin-bottom:1.25rem;background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:0.7rem 1rem;font-size:13px;">
+          <option>🌍 גלובלי - כל המשתמשים</option>
+          <option>👥 חוג הריצה שלי</option>
+          <option>👥 אתגר הבריאות המשרדי</option>
+          <option>👥 המשפחה</option>
+        </select>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;background:#FAC775;border-radius:12px;">
+            <span style="font-size:14px;font-weight:500;width:20px;">1</span>
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;">מ״כ</div>
+            <span style="flex:1;font-size:13px;font-weight:500;">מיכל כהן</span>
+            <span style="font-size:13px;font-weight:500;color:#633806;">2,410 נק'</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;">
+            <span style="font-size:14px;font-weight:500;width:20px;">2</span>
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;">ד״ל</div>
+            <span style="flex:1;font-size:13px;">דוד לוי</span>
+            <span style="font-size:13px;color:var(--text-secondary);">1,980 נק'</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;">
+            <span style="font-size:14px;font-weight:500;width:20px;">3</span>
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;">ר״ש</div>
+            <span style="flex:1;font-size:13px;">רותם שני</span>
+            <span style="font-size:13px;color:var(--text-secondary);">1,750 נק'</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;background:#F5C4B3;border-radius:12px;border:0.5px solid #D85A30;">
+            <span style="font-size:14px;font-weight:500;width:20px;">7</span>
+            <div style="width:32px;height:32px;border-radius:50%;background:#D85A30;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;color:#FAECE7;">ב</div>
+            <span style="flex:1;font-size:13px;font-weight:500;color:#712B13;">אתה</span>
+            <span style="font-size:13px;font-weight:500;color:#712B13;">890 נק'</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Settings -->
+    <div class="frame" id="settings">
+      <p class="cap">הגדרות / מנוי</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+          <i class="ti ti-arrow-right" style="font-size:20px;color:var(--text-secondary);"></i>
+          <p style="font-size:15px;font-weight:500;margin:0;">הגדרות</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:16px;color:var(--text-accent);">ב</div>
+          <div>
+            <p style="font-weight:500;font-size:15px;margin:0;">בשי קליין</p>
+            <p style="font-size:13px;color:var(--text-secondary);margin:2px 0 0;">bashy@example.com</p>
+          </div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:12px;border:0.5px solid var(--border);padding:1rem;margin-bottom:1.25rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:14px;font-weight:500;">תוכנית נוכחית</span>
+            <span style="background:var(--surface-1);font-size:12px;padding:3px 8px;border-radius:var(--radius);color:var(--text-secondary);">חינם</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">שדרג לפרימיום כדי לפתוח לוח מנצחים, באדג'ים מתקדמים ועוד</p>
+          <button style="width:100%;background:var(--fill-brand);color:var(--on-brand);border:none;border-radius:var(--radius);padding:0.7rem;font-size:13px;font-weight:500;">שדרג לפרימיום · 14.90 ש"ח לחודש</button>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:0 0 8px;">כללי</p>
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:0.5px solid var(--border);">
+            <span style="display:flex;align-items:center;gap:8px;font-size:14px;"><i class="ti ti-trophy" style="font-size:18px;color:var(--text-secondary);"></i>הצטרפות ללוח מנצחים</span>
+            <i class="ti ti-chevron-left" style="font-size:16px;color:var(--text-muted);"></i>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:0.5px solid var(--border);">
+            <span style="display:flex;align-items:center;gap:8px;font-size:14px;"><i class="ti ti-bell" style="font-size:18px;color:var(--text-secondary);"></i>התראות</span>
+            <i class="ti ti-chevron-left" style="font-size:16px;color:var(--text-muted);"></i>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;">
+            <span style="display:flex;align-items:center;gap:8px;font-size:14px;"><i class="ti ti-logout" style="font-size:18px;color:var(--text-danger);"></i><span style="color:var(--text-danger);">התנתקות</span></span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= LANDING PAGE ================= -->
+<section class="group" id="landing">
+  <h2>2. דף נחיתה</h2>
+  <p class="desc">Hero, פיצ'רים, השוואת מחירים, ו-CTA סופי</p>
+  <div style="max-width: 1100px; margin: 0 auto; background: var(--surface-1); border-radius: 20px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+
+    <!-- NAV -->
+    <div style="display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; padding: 1.25rem 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; border-radius: 9px; background: #D85A30; display: flex; align-items: center; justify-content: center;">
+          <i class="ti ti-flame" style="font-size: 18px; color: #FAECE7;"></i>
+        </div>
+        <span style="font-size: 17px; font-weight: 600;">צועדים</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 14px; color: var(--text-secondary);">התחברות</span>
+        <button style="background: #D85A30; color: #FAECE7; border: none; border-radius: 10px; padding: 0.6rem 1.1rem; font-size: 14px; font-weight: 500;">הרשמה חינם</button>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div style="max-width: 720px; margin: 0 auto; text-align: center; padding: 3rem 1.5rem 2.5rem;">
+      <span style="display: inline-block; background: var(--bg-accent); color: var(--text-accent); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; margin-bottom: 1.25rem;">🔥 חדש: לוח מנצחים ותחרות בין חברים</span>
+      <h1 style="font-size: 38px; font-weight: 600; line-height: 1.25; margin: 0 0 1rem;">כל צעד קטן שווה משהו.<br>עכשיו יש איפה לספור אותו.</h1>
+      <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 2rem; max-width: 480px; margin-inline: auto;">
+        רשמו יעדי כושר, הרגלים ואבני דרך במקום אחד. עקבו אחרי ההתקדמות, שמרו על רצף, והתחרו עם חברים - הכל בעברית מלאה.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 0.75rem;">
+        <button style="background: #D85A30; color: #FAECE7; border: none; border-radius: 12px; padding: 0.85rem 1.75rem; font-size: 15px; font-weight: 500;">התחילו בחינם</button>
+        <button style="background: var(--surface-2); color: var(--text-primary); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 0.85rem 1.75rem; font-size: 15px;">איך זה עובד?</button>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); margin: 0;">ללא כרטיס אשראי · 14 יום ניסיון חינם לפרימיום</p>
+    </div>
+
+    <!-- HERO VISUAL -->
+    <div style="max-width: 340px; margin: 0 auto 3.5rem; background: var(--surface-1); border-radius: 24px; padding: 1.25rem; box-shadow: 0 20px 50px rgba(216,90,48,0.18); border: 1px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <p style="font-size: 15px; font-weight: 500; margin: 0;">היי בשי 👋</p>
+        <div style="display: flex; align-items: center; gap: 6px; background: #FAC775; border-radius: 20px; padding: 4px 8px 4px 5px;">
+          <span style="width: 18px; height: 18px; border-radius: 50%; background: #EF9F27; display: flex; align-items: center; justify-content: center;"><i class="ti ti-bolt" style="font-size: 10px; color: #412402;"></i></span>
+          <span style="font-size: 11px; font-weight: 500; color: #412402;">890</span>
+        </div>
+      </div>
+      <div style="background: #F0997B; border-radius: 16px; padding: 1rem; margin-bottom: 0.75rem;">
+        <p style="font-size: 11px; color: #4A1B0C; opacity: 0.85; margin: 0 0 3px; font-weight: 500;">רצף נוכחי</p>
+        <div style="display: flex; align-items: baseline; gap: 5px;"><span style="font-size: 30px; font-weight: 500; color: #4A1B0C;">12</span><span style="font-size: 13px; color: #4A1B0C;">ימים 🔥</span></div>
+      </div>
+      <div style="background: var(--surface-2); border-radius: 14px; padding: 0.7rem 0.85rem; display: flex; align-items: center; gap: 10px;">
+        <div style="width: 34px; height: 34px; border-radius: 50%; background: conic-gradient(#D85A30 0% 65%, #F5EEE8 65% 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <div style="width: 25px; height: 25px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 500; color: #D85A30;">65%</div>
+        </div>
+        <p style="font-size: 12px; font-weight: 500; margin: 0; flex: 1;">לרוץ 5 ק"מ</p>
+        <span style="font-size: 10px; color: #BA7517; font-weight: 500;">+120</span>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div style="max-width: 1000px; margin: 0 auto; padding: 0 1.5rem 3.5rem;">
+      <p style="text-align: center; font-size: 22px; font-weight: 600; margin: 0 0 2rem;">כל מה שצריך כדי להתמיד</p>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+
+        <div style="background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 18px; padding: 1.5rem;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <i class="ti ti-target-arrow" style="font-size: 22px; color: var(--text-accent);"></i>
+          </div>
+          <p style="font-size: 15px; font-weight: 600; margin: 0 0 6px;">יעד לכל דבר</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5;">מספר יעד, סטריק יומי, או אבן דרך חד-פעמית - הכל באותה אפליקציה</p>
+        </div>
+
+        <div style="background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 18px; padding: 1.5rem;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #FAC775; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <i class="ti ti-clock" style="font-size: 22px; color: #633806;"></i>
+          </div>
+          <p style="font-size: 15px; font-weight: 600; margin: 0 0 6px;">טיימר מובנה</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5;">לאימונים ולהרגלים עם משך זמן - פשוט לוחצים "התחל" והרצף מתעדכן לבד</p>
+        </div>
+
+        <div style="background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 18px; padding: 1.5rem;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #9FE1CB; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <i class="ti ti-chart-line" style="font-size: 22px; color: #085041;"></i>
+          </div>
+          <p style="font-size: 15px; font-weight: 600; margin: 0 0 6px;">גרפים שמראים הכל</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5;">כל עדכון נכנס לגרף - רואים בדיוק את המגמה, לא רק את המספר הנוכחי</p>
+        </div>
+
+        <div style="background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 18px; padding: 1.5rem;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #FBEAF0; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <i class="ti ti-trophy" style="font-size: 22px; color: #72243E;"></i>
+          </div>
+          <p style="font-size: 15px; font-weight: 600; margin: 0 0 6px;">לוח מנצחים <span style="font-size: 10px; background: #FBEAF0; color: #72243E; padding: 2px 6px; border-radius: 10px; font-weight: 500;">פרימיום</span></p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5;">מתחרים מול חברים או מול כל הקהילה - opt-in בלבד, השליטה אצלכם</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div style="background: var(--surface-2); padding: 3.5rem 1.5rem;">
+      <p style="text-align: center; font-size: 22px; font-weight: 600; margin: 0 0 0.5rem;">התחילו בחינם, שדרגו כשתרצו</p>
+      <p style="text-align: center; font-size: 14px; color: var(--text-secondary); margin: 0 0 2.5rem;">14 יום התנסות חופשית בפרימיום, ללא כרטיס אשראי</p>
+
+      <div style="max-width: 700px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+        <div style="background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 20px; padding: 1.75rem;">
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 6px; font-weight: 500;">חינם</p>
+          <p style="font-size: 30px; font-weight: 600; margin: 0 0 1.25rem;">₪0</p>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem;">
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px;"><i class="ti ti-check" style="color: #1D9E75; font-size: 16px;"></i>יעדים ללא הגבלה</span>
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px;"><i class="ti ti-check" style="color: #1D9E75; font-size: 16px;"></i>גרפים והיסטוריה מלאה</span>
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px;"><i class="ti ti-check" style="color: #1D9E75; font-size: 16px;"></i>טיימר וסטריקים</span>
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px; color: var(--text-muted);"><i class="ti ti-x" style="font-size: 16px;"></i>לוח מנצחים</span>
+          </div>
+          <button style="width: 100%; background: var(--surface-2); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 0.75rem; font-size: 14px; font-weight: 500;">התחילו חינם</button>
+        </div>
+
+        <div style="background: #4A1B0C; border-radius: 20px; padding: 1.75rem; position: relative;">
+          <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #FAC775; color: #412402; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;">הכי פופולרי</span>
+          <p style="font-size: 13px; color: #F5C4B3; margin: 0 0 6px; font-weight: 500;">פרימיום</p>
+          <p style="font-size: 30px; font-weight: 600; margin: 0 0 1.25rem; color: #FAECE7;">₪14.90<span style="font-size: 14px; font-weight: 400; color: #F5C4B3;">/חודש</span></p>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem;">
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px; color: #FAECE7;"><i class="ti ti-check" style="color: #FAC775; font-size: 16px;"></i>הכל מהחינמי</span>
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px; color: #FAECE7;"><i class="ti ti-check" style="color: #FAC775; font-size: 16px;"></i>לוח מנצחים גלובלי וקבוצתי</span>
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px; color: #FAECE7;"><i class="ti ti-check" style="color: #FAC775; font-size: 16px;"></i>קבוצות תחרות ללא הגבלה</span>
+            <span style="font-size: 13px; display: flex; align-items: center; gap: 8px; color: #FAECE7;"><i class="ti ti-check" style="color: #FAC775; font-size: 16px;"></i>באדג'ים ותובנות מתקדמות</span>
+          </div>
+          <button style="width: 100%; background: #D85A30; color: #FAECE7; border: none; border-radius: 12px; padding: 0.75rem; font-size: 14px; font-weight: 500;">נסו 14 יום חינם</button>
+        </div>
+
+      </div>
+      <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin: 1.25rem 0 0;">יש גם מסלול שנתי במחיר מוזל - זמין בהרשמה</p>
+    </div>
+
+    <!-- FINAL CTA -->
+    <div style="text-align: center; padding: 3.5rem 1.5rem;">
+      <p style="font-size: 24px; font-weight: 600; margin: 0 0 0.75rem;">מוכנים לצעד הראשון?</p>
+      <p style="font-size: 14px; color: var(--text-secondary); margin: 0 0 1.5rem;">זה לוקח פחות מדקה, ואפשר להתחיל בלי כרטיס אשראי</p>
+      <button style="background: #D85A30; color: #FAECE7; border: none; border-radius: 12px; padding: 0.9rem 2.25rem; font-size: 15px; font-weight: 500;">הרשמה חינם</button>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="border-top: 0.5px solid var(--border); padding: 1.5rem; text-align: center;">
+      <p style="font-size: 12px; color: var(--text-muted); margin: 0;">צועדים © 2026 · תנאי שימוש · פרטיות</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= DESIGN EXPLORATION ================= -->
+<section class="group" id="exploration">
+  <h2>3. חקירת עיצוב - גרסאות דשבורד ולוח מנצחים שנבדקו</h2>
+  <p class="desc">גרסאות שנבנו במהלך תהליך ההחלטה, לפני שנבחר הכיוון הסופי (קורל/ענבר)</p>
+  <div class="grid">
+
+    <!-- Original basic dashboard -->
+    <div class="frame">
+      <p class="cap">מוקאפ ראשוני (ברירת מחדל)</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:var(--text-accent);">ב</div>
+            <span style="font-size:15px;font-weight:500;">שלום, בשי</span>
+          </div>
+          <i class="ti ti-settings" style="font-size:20px;color:var(--text-secondary);"></i>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;">
+          <div style="background:var(--surface-2);border-radius:var(--radius);padding:0.75rem;text-align:center;">
+            <p style="font-size:20px;font-weight:500;margin:0;">4</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">יעדים פעילים</p>
+          </div>
+          <div style="background:var(--surface-2);border-radius:var(--radius);padding:0.75rem;text-align:center;">
+            <p style="font-size:20px;font-weight:500;margin:0;color:var(--text-accent);">12</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">ימי רצף</p>
+          </div>
+          <div style="background:var(--surface-2);border-radius:var(--radius);padding:0.75rem;text-align:center;">
+            <p style="font-size:20px;font-weight:500;margin:0;">2</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">הושלמו</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--surface-2);border-radius:12px;border:0.5px solid var(--border);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:conic-gradient(var(--fill-accent) 0% 65%, var(--border) 65% 100%);display:flex;align-items:center;justify-content:center;">
+              <div style="width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;">65%</div>
+            </div>
+            <div style="flex:1;"><p style="font-size:14px;font-weight:500;margin:0;">לרוץ 5 ק"מ</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">3.25 מתוך 5 ק"מ</p></div>
+          </div>
+          <div style="background:var(--surface-2);border-radius:12px;border:0.5px solid var(--border);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--bg-success);display:flex;align-items:center;justify-content:center;"><i class="ti ti-flame" style="font-size:18px;color:var(--text-success);"></i></div>
+            <div style="flex:1;"><p style="font-size:14px;font-weight:500;margin:0;">התאמנות 3 בשבוע</p><p style="font-size:12px;color:var(--text-success);margin:2px 0 0;">רצף של 12 ימים 🔥</p></div>
+          </div>
+        </div>
+        <button style="width:100%;margin-top:1.25rem;background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:var(--radius);padding:0.8rem;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <i class="ti ti-plus" style="font-size:18px;"></i><span style="font-size:14px;font-weight:500;">יעד חדש</span>
+        </button>
+      </div></div>
+    </div>
+
+    <!-- Energetic (pre-points) -->
+    <div class="frame">
+      <p class="cap">אנרגטי (קורל/ענבר - מקורי)</p>
+      <div class="screen"><div class="screen-inner" style="background:var(--surface-0);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+          <p style="font-size:20px;font-weight:500;margin:0;">היי בשי 👋</p>
+          <div style="width:38px;height:38px;border-radius:50%;background:#F5C4B3;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:#712B13;">ב</div>
+        </div>
+        <div style="background:#F0997B;border-radius:20px;padding:1.25rem;margin-bottom:1.25rem;">
+          <p style="font-size:12px;color:#4A1B0C;opacity:0.85;margin:0 0 4px;font-weight:500;">רצף נוכחי</p>
+          <div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:40px;font-weight:500;color:#4A1B0C;">12</span><span style="font-size:15px;color:#4A1B0C;">ימים ברצף 🔥</span></div>
+          <p style="font-size:12px;color:#4A1B0C;opacity:0.85;margin:6px 0 0;">עוד 3 ימים לשבירת שיא!</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;">
+          <div style="background:var(--surface-2);border-radius:16px;padding:1rem;"><p style="font-size:22px;font-weight:500;margin:0;color:#D85A30;">4</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">יעדים פעילים</p></div>
+          <div style="background:var(--surface-2);border-radius:16px;padding:1rem;"><p style="font-size:22px;font-weight:500;margin:0;color:#BA7517;">2</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">הישגים החודש</p></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--surface-2);border-radius:16px;padding:0.9rem 1rem;display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:50%;background:conic-gradient(#D85A30 0% 65%, #F5EEE8 65% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#D85A30;">65%</div>
+            </div>
+            <div style="flex:1;"><p style="font-size:14px;font-weight:500;margin:0;">לרוץ 5 ק"מ</p><p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;">כמעט שם, תמשיך! 💪</p></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Minimal -->
+    <div class="frame">
+      <p class="cap">מינימליסטי</p>
+      <div class="screen"><div class="screen-inner" style="padding:1.75rem 1.5rem;">
+        <p style="font-size:12px;letter-spacing:0.05em;color:var(--text-muted);margin:0 0 4px;text-transform:uppercase;">28 באוגוסט</p>
+        <p style="font-size:22px;font-weight:500;margin:0 0 1.75rem;">שלום, בשי</p>
+        <div style="display:flex;align-items:baseline;gap:24px;margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:0.5px solid var(--border);">
+          <div><p style="font-size:26px;font-weight:500;margin:0;">4</p><p style="font-size:12px;color:var(--text-muted);margin:2px 0 0;">פעילים</p></div>
+          <div><p style="font-size:26px;font-weight:500;margin:0;">12</p><p style="font-size:12px;color:var(--text-muted);margin:2px 0 0;">ימי רצף</p></div>
+          <div><p style="font-size:26px;font-weight:500;margin:0;">2</p><p style="font-size:12px;color:var(--text-muted);margin:2px 0 0;">הושלמו</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:0.9rem 0;border-bottom:0.5px solid var(--border);">
+          <span style="font-size:13px;color:var(--text-muted);width:32px;">65%</span>
+          <div style="flex:1;"><p style="font-size:14px;margin:0;">לרוץ 5 ק"מ</p></div>
+          <div style="width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="width:65%;height:100%;background:var(--text-primary);"></div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:0.9rem 0;">
+          <span style="font-size:13px;color:var(--text-muted);width:32px;">12ד</span>
+          <div style="flex:1;"><p style="font-size:14px;margin:0;">התאמנות 3 בשבוע</p></div>
+          <span style="font-size:12px;color:var(--text-muted);">רצף</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin:1.75rem 0 0;text-align:center;border-top:0.5px solid var(--border);padding-top:1rem;">+ הוספת יעד חדש</p>
+      </div></div>
+    </div>
+
+    <!-- Gamified dark -->
+    <div class="frame">
+      <p class="cap">גיימיפייד (כהה/סגול)</p>
+      <div class="screen"><div class="screen-inner" style="background:#1a1625;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+          <div><p style="font-size:12px;color:#AFA9EC;margin:0;font-weight:500;">רמה 7</p><p style="font-size:18px;color:#F5F4FE;margin:2px 0 0;font-weight:500;">בשי קליין</p></div>
+          <div style="width:42px;height:42px;border-radius:50%;background:#534AB7;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:#F5F4FE;border:2px solid #7F77DD;">ב</div>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:11px;color:#AFA9EC;">1,240 XP</span><span style="font-size:11px;color:#AFA9EC;">1,500 XP לרמה הבאה</span></div>
+          <div style="width:100%;height:8px;background:#2a2438;border-radius:4px;overflow:hidden;"><div style="width:82%;height:100%;background:#7F77DD;"></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem;">
+          <div style="background:#241f33;border-radius:14px;padding:0.75rem;text-align:center;border:0.5px solid #3a3350;"><i class="ti ti-flame" style="font-size:18px;color:#F0997B;"></i><p style="font-size:16px;font-weight:500;margin:4px 0 0;color:#F5F4FE;">12</p><p style="font-size:10px;color:#8a83a8;margin:0;">רצף</p></div>
+          <div style="background:#241f33;border-radius:14px;padding:0.75rem;text-align:center;border:0.5px solid #3a3350;"><i class="ti ti-target-arrow" style="font-size:18px;color:#7F77DD;"></i><p style="font-size:16px;font-weight:500;margin:4px 0 0;color:#F5F4FE;">4</p><p style="font-size:10px;color:#8a83a8;margin:0;">פעילים</p></div>
+          <div style="background:#241f33;border-radius:14px;padding:0.75rem;text-align:center;border:0.5px solid #3a3350;"><i class="ti ti-award" style="font-size:18px;color:#FAC775;"></i><p style="font-size:16px;font-weight:500;margin:4px 0 0;color:#F5F4FE;">9</p><p style="font-size:10px;color:#8a83a8;margin:0;">באדג'ים</p></div>
+        </div>
+        <div style="background:#241f33;border-radius:14px;padding:0.85rem 1rem;display:flex;align-items:center;gap:12px;border:0.5px solid #3a3350;">
+          <div style="width:38px;height:38px;border-radius:10px;background:#2f2843;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-run" style="font-size:18px;color:#AFA9EC;"></i></div>
+          <div style="flex:1;"><p style="font-size:13px;font-weight:500;margin:0;color:#F5F4FE;">לרוץ 5 ק"מ</p>
+            <div style="width:100%;height:4px;background:#3a3350;border-radius:2px;margin-top:6px;overflow:hidden;"><div style="width:65%;height:100%;background:#7F77DD;"></div></div>
+          </div>
+          <span style="font-size:11px;color:#8a83a8;">65%</span>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Amber/gold -->
+    <div class="frame">
+      <p class="cap">זהב/ענבר (מדליה)</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+          <p style="font-size:20px;font-weight:500;margin:0;">היי בשי 👋</p>
+          <div style="width:38px;height:38px;border-radius:50%;background:#FAC775;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:#633806;">ב</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#FAC775,#EF9F27);border-radius:20px;padding:1.25rem;margin-bottom:1.25rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div><p style="font-size:12px;color:#412402;opacity:0.8;margin:0 0 4px;font-weight:500;">רצף נוכחי</p><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:36px;font-weight:500;color:#412402;">12</span><span style="font-size:14px;color:#412402;">ימים</span></div></div>
+            <i class="ti ti-medal" style="font-size:44px;color:#412402;opacity:0.85;"></i>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem;">
+          <div style="background:var(--surface-2);border-radius:14px;padding:0.75rem;text-align:center;"><p style="font-size:18px;font-weight:500;margin:0;color:#BA7517;">4</p><p style="font-size:11px;color:var(--text-secondary);margin:2px 0 0;">פעילים</p></div>
+          <div style="background:var(--surface-2);border-radius:14px;padding:0.75rem;text-align:center;"><p style="font-size:18px;font-weight:500;margin:0;color:#BA7517;">2</p><p style="font-size:11px;color:var(--text-secondary);margin:2px 0 0;">הושלמו</p></div>
+          <div style="background:var(--surface-2);border-radius:14px;padding:0.75rem;text-align:center;"><p style="font-size:18px;font-weight:500;margin:0;color:#BA7517;">9</p><p style="font-size:11px;color:var(--text-secondary);margin:2px 0 0;">מדליות</p></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Pink -->
+    <div class="frame">
+      <p class="cap">ורוד/קורל רך</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+          <p style="font-size:20px;font-weight:500;margin:0;">היי בשי 👋</p>
+          <div style="width:38px;height:38px;border-radius:50%;background:#F4C0D1;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:#72243E;">ב</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:1.25rem;">
+          <div style="flex:1.3;background:#D4537E;border-radius:20px;padding:1.1rem;color:#FBEAF0;"><p style="font-size:11px;opacity:0.9;margin:0 0 4px;font-weight:500;">רצף נוכחי</p><div style="display:flex;align-items:baseline;gap:4px;"><span style="font-size:32px;font-weight:500;">12</span><span style="font-size:12px;">ימים 🔥</span></div></div>
+          <div style="flex:1;background:#F0997B;border-radius:20px;padding:1.1rem;color:#4A1B0C;"><p style="font-size:11px;opacity:0.85;margin:0 0 4px;font-weight:500;">השלמו</p><span style="font-size:32px;font-weight:500;">2</span></div>
+        </div>
+        <div style="background:#FBEAF0;border-radius:18px;padding:0.9rem 1rem;display:flex;align-items:center;gap:12px;">
+          <div style="width:42px;height:42px;border-radius:50%;background:conic-gradient(#D4537E 0% 65%, #F0C5D8 65% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><div style="width:32px;height:32px;border-radius:50%;background:#FBEAF0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#993556;">65%</div></div>
+          <div style="flex:1;"><p style="font-size:14px;font-weight:500;margin:0;color:#4B1528;">לרוץ 5 ק"מ</p><p style="font-size:12px;color:#993556;margin:2px 0 0;">כמעט שם, תמשיך!</p></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Coral-teal -->
+    <div class="frame">
+      <p class="cap">קורל-טורקיז ניגודי</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+          <p style="font-size:20px;font-weight:500;margin:0;">היי בשי 👋</p>
+          <div style="width:38px;height:38px;border-radius:50%;background:#9FE1CB;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:#085041;">ב</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:20px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#F0997B;display:flex;align-items:center;justify-content:center;"><i class="ti ti-flame" style="font-size:22px;color:#4A1B0C;"></i></div>
+            <div><p style="font-size:22px;font-weight:500;margin:0;">12 ימים</p><p style="font-size:12px;color:var(--text-secondary);margin:0;">רצף פעיל</p></div>
+          </div>
+          <span style="background:#5DCAA5;color:#04342C;font-size:11px;font-weight:500;padding:5px 10px;border-radius:20px;">שיא אישי!</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+          <div style="background:#F5C4B3;border-radius:16px;padding:0.9rem;text-align:center;"><p style="font-size:20px;font-weight:500;margin:0;color:#712B13;">4</p><p style="font-size:12px;color:#993C1D;margin:2px 0 0;">יעדים פעילים</p></div>
+          <div style="background:#9FE1CB;border-radius:16px;padding:0.9rem;text-align:center;"><p style="font-size:20px;font-weight:500;margin:0;color:#085041;">2</p><p style="font-size:12px;color:#0F6E56;margin:2px 0 0;">הושלמו</p></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Leaderboard original (pre group selector) -->
+    <div class="frame">
+      <p class="cap">לוח מנצחים (גרסה מוקדמת - לפי סטריק)</p>
+      <div class="screen"><div class="screen-inner">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+          <i class="ti ti-arrow-right" style="font-size:20px;color:var(--text-secondary);"></i>
+          <p style="font-size:15px;font-weight:500;margin:0;flex:1;">לוח מנצחים</p>
+          <span style="background:var(--bg-pro);color:var(--text-pro);font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--radius);">פרימיום</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
+          <button style="flex:1;background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:var(--radius);padding:0.5rem;font-size:13px;font-weight:500;">גלובלי</button>
+          <button style="flex:1;background:transparent;border:0.5px solid var(--border-strong);border-radius:var(--radius);padding:0.5rem;font-size:13px;">הקבוצה שלי</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;background:var(--bg-warning);border-radius:12px;">
+            <span style="font-size:14px;font-weight:500;width:20px;">1</span>
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;">מ״כ</div>
+            <span style="flex:1;font-size:13px;font-weight:500;">מיכל כהן</span>
+            <span style="font-size:13px;font-weight:500;color:var(--text-warning);">🔥 41</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;">
+            <span style="font-size:14px;font-weight:500;width:20px;">2</span>
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:12px;">ד״ל</div>
+            <span style="flex:1;font-size:13px;">דוד לוי</span>
+            <span style="font-size:13px;color:var(--text-secondary);">🔥 33</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  var ctx = document.getElementById('progressChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['1 אוג','8 אוג','15 אוג','18 אוג','24 אוג','28 אוג'],
+      datasets: [{ data: [0,0.5,1.2,1.5,2.8,3.25], borderColor:'#D85A30', backgroundColor:'#D85A30', tension:0.3, pointRadius:3, fill:false }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#6B6459',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#6B6459',font:{size:10}},grid:{color:'rgba(128,128,128,0.1)'}}
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -18,12 +18,21 @@ function getFriendlyAuthError(
 ): string {
   const message = error?.message?.toLowerCase() ?? "";
 
+  const rateLimitPatterns = [
+    "rate limit",
+    "too many requests",
+    "too many attempts",
+    "many attempts",
+    "request limit exceeded",
+    "too many sign in attempts",
+    "too many sign-up attempts",
+  ];
+
   if (
     error?.status === 429 ||
-    message.includes("rate limit") ||
-    message.includes("too many requests")
+    rateLimitPatterns.some((pattern) => message.includes(pattern))
   ) {
-    return "המערכת חרגה ממגבלת שליחת אימיילים זמנית. נסו שוב בעוד כמה דקות, או התחברו עם Google.";
+    return "המערכת חרגה ממגבלת שליחת אימיילים זמנית. המתינו כמה דקות ונסו שוב, או התחברו באמצעות Google.";
   }
 
   if (message.includes("email") && message.includes("already")) {
