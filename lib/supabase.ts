@@ -12,21 +12,35 @@ export const supabase = createClient(
     auth: {
       persistSession: false,
       autoRefreshToken: false,
+      flowType: "pkce",
+      detectSessionInUrl: true,
     },
   }
 );
 
+let browserClient: ReturnType<typeof createClient> | null = null;
+
 export const getSupabaseBrowserClient = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   if (!hasSupabaseConfig) {
     return null;
   }
 
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  });
+  if (!browserClient) {
+    browserClient = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        flowType: "pkce",
+        detectSessionInUrl: true,
+      },
+    });
+  }
+
+  return browserClient;
 };
 
 export const supabaseAdmin = createClient(
@@ -36,6 +50,7 @@ export const supabaseAdmin = createClient(
     auth: {
       persistSession: false,
       autoRefreshToken: false,
+      flowType: "pkce",
     },
   }
 );

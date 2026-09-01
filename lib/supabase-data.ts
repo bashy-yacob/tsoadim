@@ -65,8 +65,8 @@ export async function getDashboardData(): Promise<{ profile: ProfileRecord; goal
   }
 
   const [{ data: profileData, error: profileError }, { data: goalsData, error: goalsError }] = await Promise.all([
-    client.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    client.from("goals").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+    (client.from("profiles") as any).select("*").eq("id", user.id).maybeSingle(),
+    (client.from("goals") as any).select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
   ]);
 
   if (profileError && profileError.code !== "PGRST116") {
@@ -97,7 +97,7 @@ export async function getGoalById(goalId: string): Promise<{ goal: GoalRecord; c
     return { goal: fallbackGoal, chartData: goalHistory[fallbackGoal.id] ?? [] };
   }
 
-  const { data, error } = await client.from("goals").select("*").eq("id", goalId).maybeSingle();
+  const { data, error } = await (client.from("goals") as any).select("*").eq("id", goalId).maybeSingle();
 
   if (error || !data) {
     const fallbackGoal = initialGoals.find((goal) => goal.id === goalId) ?? initialGoals[0];
@@ -123,7 +123,7 @@ export async function ensureProfileForUser(userId: string, displayName: string) 
     return null;
   }
 
-  return client.from("profiles").upsert(
+  return (client.from("profiles") as any).upsert(
     {
       id: userId,
       display_name: displayName,
@@ -155,7 +155,7 @@ export async function createGoalRecord(input: {
     return { error: new Error("המשתמש לא מחובר"), created: false };
   }
 
-  const { error } = await client.from("goals").insert([
+  const { error } = await (client.from("goals") as any).insert([
     {
       user_id: user.id,
       title: input.title,
@@ -165,7 +165,7 @@ export async function createGoalRecord(input: {
       current_streak: 0,
       longest_streak: 0,
       status: "active",
-      current_value: Number(input.details.start_value ?? 0),
+      current_value: Number((input.details as any).start_value ?? 0),
       is_completed: false,
     },
   ]);

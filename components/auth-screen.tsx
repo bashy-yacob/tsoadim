@@ -4,186 +4,212 @@ import {
   IconArrowLeft,
   IconBrandGoogle,
   IconTargetArrow,
+  IconAlertCircle,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ScreenShell } from "@/components/screen-shell";
-import { getSupabaseBrowserClient, hasSupabaseConfig } from "@/lib/supabase";
-import { ensureProfileForUser } from "@/lib/supabase-data";
+import { signUpWithEmail, signInWithEmail, signInWithGoogle } from "@/lib/auth";
 
 export function AuthScreen() {
   const router = useRouter();
-  const [mode, setMode] = useState<"register" | "login">("register");
-  const [fullName, setFullName] = useState("בשי קליין");
-  const [email, setEmail] = useState("name@example.com");
-  const [password, setPassword] = useState("12345678");
+  const [mode, setMode] = useState<"signup" | "signin">("signup");
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
-
-    if (!hasSupabaseConfig) {
-      router.push("/dashboard");
-      return;
-    }
-
-    const client = getSupabaseBrowserClient();
-    if (!client) {
-      router.push("/dashboard");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      if (mode === "register") {
-        const { data, error: signUpError } = await client.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim() || "משתמש חדש",
-            },
-          },
-        });
-
-        if (signUpError) {
-          setError(signUpError.message);
+      if (mode === "signup") {
+        if (!displayName.trim()) {
+          setError("שם תצוגה הוא חובה");
+          return;
+        }
+        const result = await signUpWithEmail(email, password, displayName);
+        if (!result.success) {
+          setError(result.error || "נכשל הרישום");
           return;
         }
 
-        const userId = data.user?.id;
-        if (userId) {
-          await ensureProfileForUser(userId, fullName.trim() || "משתמש חדש");
+        if (result.needsEmailConfirmation) {
+          setError("נשלח אימייל אישור. אמת את החשבון לפני הכניסה.");
+          setMode("signin");
+          return;
         }
       } else {
-        const { error: loginError } = await client.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (loginError) {
-          setError(loginError.message);
+        const result = await signInWithEmail(email, password);
+        if (!result.success) {
+          setError(result.error || "נכשלה ההתחברות");
           return;
         }
       }
 
       router.push("/dashboard");
-    } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "אירעה שגיאה בהתחברות");
+    } catch (err) {
+      setError("אירעה שגיאה בתהליך");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setIsSubmitting(true);
+    const result = await signInWithGoogle();
+    if (!result.success) {
+      setError(result.error || "נכשלה ההתחברות עם Google");
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <ScreenShell>
-      <div className="mb-4 flex items-center justify-between">
-        <Link href="/" className="text-[18px] text-[#6b5346]" aria-label="חזרה">
-          <IconArrowLeft size={18} />
-        </Link>
-        <div className="text-[15px] font-medium text-[#2d120b]">התחברות</div>
-      </div>
-
-      <div className="mb-6 text-center">
-        <div className="mx-auto mb-3 flex h-[56px] w-[56px] items-center justify-center rounded-[16px] bg-[#F5C4B3]">
-          <IconTargetArrow size={28} color="#B94A26" />
-        </div>
-        <p className="text-[18px] font-medium text-[#2d120b]">בואו נתחיל להתקדם</p>
-        <p className="mt-1 text-[13px] text-[#6B6459]">רשמו יעדים, עקבו אחרי התקדמות, חגגו הישגים</p>
-      </div>
-
-      <div className="mb-5 flex gap-2 rounded-[12px] bg-[#F5F3EF] p-1">
-        {[
-          { key: "register", label: "הרשמה" },
-          { key: "login", label: "התחברות" },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setMode(tab.key as "register" | "login")}
-            className={`flex-1 rounded-[8px] px-2 py-2 text-[13px] font-medium ${
-              mode === tab.key ? "bg-[#fff] text-[#2d120b] shadow-sm" : "text-[#6B6459]"
-            }`}
+    <main
+      className="flex min-h-screen flex-col bg-[#FAF9F6] px-4 py-6"
+      dir="rtl"
+    >
+      <div className="mx-auto w-full max-w-[420px]">
+        {/* Header */}
+        <div className="mb-6 flex items-center gap-3">
+          <Link
+            href="/"
+            className="flex h-[36px] w-[36px] items-center justify-center rounded-full hover:bg-[#F5F3EF] transition-colors"
+            aria-label="חזרה"
           >
-            {tab.label}
+            <IconArrowLeft size={20} className="text-[#6B6459]" />
+          </Link>
+          <h1 className="text-[20px] font-medium text-[#1F1B16]">
+            {mode === "signup" ? "הרשמה" : "התחברות"}
+          </h1>
+        </div>
+
+        {/* Logo & Title */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-[60px] w-[60px] items-center justify-center rounded-[16px] bg-[#F5C4B3]">
+            <IconTargetArrow size={32} className="text-[#B94A26]" />
+          </div>
+          <h2 className="mb-2 text-[22px] font-medium text-[#1F1B16]">
+            {mode === "signup" ? "בואו נתחיל להתקדם" : "חזרו לצועדים"}
+          </h2>
+          <p className="text-[14px] leading-6 text-[#6B6459]">
+            {mode === "signup"
+              ? "רשמו יעדים, עקבו אחרי התקדמות, חגגו הישגים עם קהילה"
+              : "התחברו כדי לראות את יעדיכם והתקדמותכם"}
+          </p>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 flex gap-3 rounded-[12px] bg-[#FDE5E5] p-3">
+            <IconAlertCircle size={20} className="flex-shrink-0 text-[#D85A30]" />
+            <p className="text-[13px] text-[#5A3A32]">{error}</p>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="mb-6 space-y-4">
+          {mode === "signup" && (
+            <div>
+              <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
+                שם תצוגה
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="למשל: בשי"
+                className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 text-[14px] outline-none focus:border-[#D85A30] transition-colors"
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
+              דוא״ל
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="name@example.com"
+              className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 text-[14px] outline-none focus:border-[#D85A30] transition-colors"
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
+              סיסמה
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 text-[14px] outline-none focus:border-[#D85A30] transition-colors"
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-[12px] bg-[#D85A30] px-4 py-3 text-[14px] font-medium text-white transition-opacity disabled:opacity-60 hover:opacity-90"
+          >
+            {isSubmitting
+              ? "טוען..."
+              : mode === "signup"
+              ? "הרשם בחינם"
+              : "התחבר"}
           </button>
-        ))}
+        </form>
+
+        {/* Divider */}
+        <div className="mb-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-[#E5E1D8]" />
+          <span className="text-[12px] text-[#9C9585]">או</span>
+          <div className="h-px flex-1 bg-[#E5E1D8]" />
+        </div>
+
+        {/* Google Sign In */}
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={isSubmitting}
+          className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 flex items-center justify-center gap-2 text-[14px] font-medium text-[#1F1B16] transition-colors hover:bg-[#F5F3EF] disabled:opacity-60"
+        >
+          <IconBrandGoogle size={18} />
+          <span>התחברות עם Google</span>
+        </button>
+
+        {/* Mode Toggle */}
+        <div className="mt-6 text-center">
+          <p className="text-[13px] text-[#6B6459]">
+            {mode === "signup" ? "יש לכם חשבון?" : "אין לכם חשבון?"}
+            <button
+              onClick={() => {
+                setMode(mode === "signup" ? "signin" : "signup");
+                setError(null);
+              }}
+              className="mr-1 font-medium text-[#D85A30] hover:underline"
+            >
+              {mode === "signup" ? "התחברו" : "הרשמו"}
+            </button>
+          </p>
+        </div>
+
+        {/* Terms */}
+        <p className="mt-6 text-center text-[12px] leading-5 text-[#9C9585]">
+          בהמשך, אתם מסכימים לתנאי השימוש שלנו
+          <br />
+          ול<span className="inline cursor-pointer hover:underline">מדיניות הפרטיות</span>
+        </p>
       </div>
-
-      {mode === "register" && (
-        <>
-          <label className="mb-3 block text-[13px] text-[#6B6459]">שם מלא</label>
-          <input
-            type="text"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-            placeholder="בשי קליין"
-            className="mb-4 w-full rounded-[10px] border border-[#D9C9BF] bg-white px-3 py-2.5 text-[14px] outline-none"
-          />
-          <label className="mb-3 block text-[13px] text-[#6B6459]">אימייל</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="name@example.com"
-            className="mb-4 w-full rounded-[10px] border border-[#D9C9BF] bg-white px-3 py-2.5 text-[14px] outline-none"
-          />
-          <label className="mb-3 block text-[13px] text-[#6B6459]">סיסמה</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="לפחות 8 תווים"
-            className="mb-5 w-full rounded-[10px] border border-[#D9C9BF] bg-white px-3 py-2.5 text-[14px] outline-none"
-          />
-        </>
-      )}
-
-      {mode === "login" && (
-        <>
-          <label className="mb-3 block text-[13px] text-[#6B6459]">אימייל</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="name@example.com"
-            className="mb-4 w-full rounded-[10px] border border-[#D9C9BF] bg-white px-3 py-2.5 text-[14px] outline-none"
-          />
-          <label className="mb-3 block text-[13px] text-[#6B6459]">סיסמה</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="••••••••"
-            className="mb-5 w-full rounded-[10px] border border-[#D9C9BF] bg-white px-3 py-2.5 text-[14px] outline-none"
-          />
-        </>
-      )}
-
-      {error && <p className="mb-4 text-[12px] text-[#b8482d]">{error}</p>}
-
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="mb-4 block w-full rounded-[12px] bg-[#D85A30] px-4 py-3 text-center text-[14px] font-medium text-[#FAECE7] disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {isSubmitting ? "מעבד..." : mode === "register" ? "יצירת חשבון" : "התחברות"}
-      </button>
-
-      <div className="mb-4 flex items-center gap-3">
-        <div className="h-px flex-1 bg-[#E5E1D8]" />
-        <span className="text-[12px] text-[#9C9585]">או</span>
-        <div className="h-px flex-1 bg-[#E5E1D8]" />
-      </div>
-
-      <button type="button" className="flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#D9C9BF] bg-transparent px-4 py-3 text-[14px] text-[#2d120b]">
-        <IconBrandGoogle size={18} />
-        המשך עם Google
-      </button>
-    </ScreenShell>
+    </main>
   );
 }

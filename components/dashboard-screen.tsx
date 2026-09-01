@@ -1,8 +1,8 @@
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
 
 type DashboardScreenProps = {
-  profile: ProfileRecord | null;
-  goals: GoalRecord[];
+  profile?: ProfileRecord | null;
+  goals?: GoalRecord[];
 };
 
 const formatValue = (value: number | null | undefined, unit?: string | null) => {
@@ -84,7 +84,7 @@ const renderGoalCard = (goal: GoalRecord) => {
   );
 };
 
-export function DashboardScreen({ profile, goals }: DashboardScreenProps) {
+export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenProps) {
   const totalPoints = profile?.total_points ?? 0;
   const longestStreak = goals.reduce((max, goal) => Math.max(max, goal.current_streak), 0);
   const primaryGoal = goals[0];
