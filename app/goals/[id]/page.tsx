@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IconEdit,
   IconArrowRight,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -8,7 +9,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ScreenShell } from "@/components/screen-shell";
-import { initialGoals } from "@/lib/mock-data";
+import { StreakTimer } from "@/components/streak-timer";
 import { getGoalById } from "@/lib/supabase-data";
 import type { GoalHistoryPoint, GoalRecord } from "@/types/goals";
 
@@ -38,12 +39,8 @@ function getGoalProgress(goal: GoalRecord) {
 
 export default function GoalDetailsPage() {
   const params = useParams<{ id: string }>();
-  const [goal, setGoal] = useState<GoalRecord>(initialGoals[0]);
-  const [chartData, setChartData] = useState<GoalHistoryPoint[]>([
-    { date: "היום", value: 0 },
-    { date: "שבוע", value: 25 },
-    { date: "חודש", value: 50 },
-  ]);
+  const [goal, setGoal] = useState<GoalRecord | null>(null);
+  const [chartData, setChartData] = useState<GoalHistoryPoint[]>([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -62,6 +59,14 @@ export default function GoalDetailsPage() {
     };
   }, [params.id]);
 
+  if (!goal) {
+    return (
+      <ScreenShell>
+        <p className="text-[14px] text-[#6b5346]">טוען את נתוני היעד...</p>
+      </ScreenShell>
+    );
+  }
+
   const progress = Math.round(getGoalProgress(goal));
 
   return (
@@ -70,7 +75,15 @@ export default function GoalDetailsPage() {
         <Link href="/dashboard" className="text-[18px] text-[#6b5346]" aria-label="חזרה">
           <IconArrowRight size={18} />
         </Link>
-        <p className="text-[15px] font-medium text-[#2d120b]">{goal.title}</p>
+        <p className="flex-1 text-[15px] font-medium text-[#2d120b]">{goal.title}</p>
+        <Link
+          href={`/goals/${goal.id}/edit`}
+          className="flex h-9 w-9 items-center justify-center rounded-full text-[#6b5346] transition-colors hover:bg-[#f5ebe5]"
+          aria-label="עריכת יעד"
+          title="עריכת יעד"
+        >
+          <IconEdit size={18} />
+        </Link>
       </div>
 
       <div className="mb-5 flex items-baseline gap-2">
@@ -87,6 +100,14 @@ export default function GoalDetailsPage() {
       <div className="mb-5 h-[8px] overflow-hidden rounded-full bg-[#f0dfd5]">
         <div className="h-full rounded-full bg-[#D85A30]" style={{ width: `${progress}%` }} />
       </div>
+
+      {goal.type === "streak" && Number(goal.details.duration_minutes) > 0 && (
+        <StreakTimer
+          goalId={goal.id}
+          durationMinutes={Number(goal.details.duration_minutes)}
+          onCompleted={() => window.location.reload()}
+        />
+      )}
 
       <div className="mb-5 h-[180px] rounded-[16px] bg-[#fff6f1] p-3">
         <ResponsiveContainer width="100%" height="100%">

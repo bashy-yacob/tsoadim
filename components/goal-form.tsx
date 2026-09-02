@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconAlertCircle, IconArrowLeft } from "@tabler/icons-react";
 import { getCurrentUser } from "@/lib/auth";
-import { createGoal, type GoalType } from "@/lib/database";
+import { createGoal, updateGoal, type GoalType } from "@/lib/database";
+import { getGoalById } from "@/lib/supabase-data";
+import type { GoalRecord } from "@/types/goals";
 
-export function GoalFormComponent() {
+type GoalFormProps = {
+  goalId?: string;
+};
+
+export function GoalFormComponent({ goalId }: GoalFormProps) {
   const router = useRouter();
+  const isEditMode = Boolean(goalId);
 
   const [goalType, setGoalType] = useState<GoalType>("quantitative");
   const [title, setTitle] = useState("");
@@ -26,6 +33,45 @@ export function GoalFormComponent() {
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditMode);
+
+  useEffect(() => {
+    if (!goalId) return;
+
+    let isMounted = true;
+
+    const loadGoal = async () => {
+      const result = await getGoalById(goalId);
+
+      if (!isMounted) return;
+
+      if (!result) {
+        setError("לא ניתן לטעון את היעד");
+        setIsLoading(false);
+        return;
+      }
+
+      const goal: GoalRecord = result.goal;
+      const details = goal.details ?? {};
+      setGoalType(goal.type);
+      setTitle(goal.title);
+      setCategory(goal.category || "בריאות");
+      setStartValue(details.start_value == null ? "" : String(details.start_value));
+      setTargetValue(details.target_value == null ? "" : String(details.target_value));
+      setUnit(details.unit == null ? "" : String(details.unit));
+      setFrequency(details.frequency === "weekly" ? "weekly" : "daily");
+      setTargetPerWeek(details.target_per_week == null ? "" : String(details.target_per_week));
+      setDurationMinutes(details.duration_minutes == null ? "" : String(details.duration_minutes));
+      setDueDate(details.due_date == null ? "" : String(details.due_date));
+      setIsLoading(false);
+    };
+
+    void loadGoal();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [goalId]);
 
   const validateForm = (): boolean => {
     if (!title.trim()) {
@@ -104,20 +150,21 @@ export function GoalFormComponent() {
         details.due_date = dueDate;
       }
 
-      const newGoal = await createGoal(
-        user.id,
-        title.trim(),
-        goalType,
-        details,
-        category || undefined
-      );
+      const savedGoal = goalId
+        ? await updateGoal(goalId, {
+            title: title.trim(),
+            type: goalType,
+            details,
+            category: category || undefined,
+          })
+        : await createGoal(user.id, title.trim(), goalType, details, category || undefined);
 
-      if (!newGoal) {
-        setError("נכשל יצירת היעד");
+      if (!savedGoal) {
+        setError(isEditMode ? "נכשל עדכון היעד" : "נכשל יצירת היעד");
         return;
       }
 
-      router.push(`/goals/${newGoal.id}`);
+      router.push(`/goals/${savedGoal.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "שגיאה בעת יצירת היעד");
     } finally {
@@ -146,7 +193,9 @@ export function GoalFormComponent() {
           >
             <IconArrowLeft size={20} className="text-[#6B6459]" />
           </Link>
-          <h1 className="text-[24px] font-medium text-[#1F1B16]">יעד חדש</h1>
+          <h1 className="text-[24px] font-medium text-[#1F1B16]">
+            {isEditMode ? "עריכת יעד" : "יעד חדש"}
+          </h1>
         </div>
 
         {error && (
@@ -156,6 +205,9 @@ export function GoalFormComponent() {
           </div>
         )}
 
+        {isLoading ? (
+          <p className="text-[14px] text-[#6B6459]">טוען את נתוני היעד...</p>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="mb-3 block text-[13px] font-medium text-[#1F1B16]">
@@ -334,9 +386,10 @@ export function GoalFormComponent() {
             disabled={isSubmitting}
             className="w-full rounded-[12px] bg-[#D85A30] px-4 py-3 text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           >
-            {isSubmitting ? "שומר..." : "שמור יעד"}
+            {isSubmitting ? "שומר..." : isEditMode ? "שמור שינויים" : "שמור יעד"}
           </button>
         </form>
+        )}
       </div>
     </main>
   );

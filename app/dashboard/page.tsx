@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardScreen } from "@/components/dashboard-screen";
 import { getCurrentUser } from "@/lib/auth";
-import { getGoals, getProfile } from "@/lib/database";
+import { getGoals, getProfile, getProgressEntries } from "@/lib/database";
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
-import { initialGoals, profile as fallbackProfile } from "@/lib/mock-data";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<ProfileRecord | null>(fallbackProfile);
-  const [goals, setGoals] = useState<GoalRecord[]>(initialGoals);
+  const [profile, setProfile] = useState<ProfileRecord | null>(null);
+  const [goals, setGoals] = useState<GoalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +28,9 @@ export default function DashboardPage() {
         getProfile(user.id),
         getGoals(user.id),
       ]);
+      const progressEntries = await Promise.all(
+        goalsData.map((goal) => getProgressEntries(goal.id))
+      );
 
       if (!isMounted) return;
 
@@ -40,25 +42,26 @@ export default function DashboardPage() {
               total_points: profileData.total_points,
               avatar_url: profileData.avatar_url ?? null,
             }
-          : fallbackProfile
+          : null
       );
 
       setGoals(
-        goalsData.length > 0
-          ? goalsData.map((goal) => ({
-              id: goal.id,
-              title: goal.title,
-              type: goal.type,
-              status: goal.status,
-              current_streak: goal.current_streak ?? 0,
-              longest_streak: goal.longest_streak ?? 0,
-              created_at: goal.created_at,
-              completed_at: goal.completed_at ?? null,
-              details: goal.details ?? {},
-              current_value: Number(goal.details?.start_value ?? 0),
-              is_completed: goal.status === "completed",
-            }))
-          : initialGoals
+        goalsData.map((goal, index) => ({
+          id: goal.id,
+          title: goal.title,
+          type: goal.type,
+          category: goal.category ?? null,
+          status: goal.status,
+          current_streak: goal.current_streak ?? 0,
+          longest_streak: goal.longest_streak ?? 0,
+          created_at: goal.created_at,
+          completed_at: goal.completed_at ?? null,
+          details: goal.details ?? {},
+          current_value: Number(
+            progressEntries[index][0]?.value ?? goal.details?.start_value ?? 0
+          ),
+          is_completed: goal.status === "completed",
+        }))
       );
 
       setIsLoading(false);

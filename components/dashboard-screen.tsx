@@ -1,4 +1,5 @@
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
+import Link from "next/link";
 
 type DashboardScreenProps = {
   profile?: ProfileRecord | null;
@@ -61,8 +62,10 @@ const renderGoalCard = (goal: GoalRecord) => {
       : "+120";
 
   return (
-    <div
+    <Link
+      href={`/goals/${goal.id}`}
       key={goal.id}
+      aria-label={`פתיחת היעד ${goal.title}`}
       className="flex items-center gap-3 rounded-[16px] bg-[#f6f0eb] p-3 shadow-[inset_0_0_0_1px_rgba(96,65,52,0.06)]"
     >
       <div
@@ -80,7 +83,7 @@ const renderGoalCard = (goal: GoalRecord) => {
         <p className="mt-1 text-[12px] text-[#6b5346]">{progressText}</p>
       </div>
       <span className="text-[11px] font-medium text-[#BA7517]">{chipText}</span>
-    </div>
+    </Link>
   );
 };
 
@@ -94,10 +97,15 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
       <div className="w-full max-w-[420px] rounded-[30px] border border-[#e8d7cd] bg-[#fffaf6] p-4 shadow-[0_20px_50px_rgba(86,45,23,0.08)]" dir="rtl">
         <div className="mb-5 flex items-center justify-between gap-3">
           <p className="text-[20px] font-medium text-[#2d120b]">היי {profile?.display_name ?? "משתמש"} 👋</p>
-          <div className="flex items-center gap-2 rounded-full bg-[#FAC775] px-[10px] py-[5px] pr-[6px] text-[#412402]">
-            <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#EF9F27] text-[13px]">⚡</span>
-            <span className="text-[13px] font-medium">{totalPoints}</span>
+          <div className="flex items-center gap-2">
+            <Link href="/leaderboard" className="rounded-full bg-[#f6f0eb] px-3 py-2 text-[12px] text-[#6b5346]">לוח מנצחים</Link>
+            <Link href="/settings" className="rounded-full bg-[#f6f0eb] px-3 py-2 text-[12px] text-[#6b5346]">הגדרות</Link>
           </div>
+        </div>
+
+        <div className="mb-5 flex items-center justify-between rounded-[12px] bg-[#FAC775] px-3 py-2 text-[#412402]">
+          <span className="text-[12px]">נקודות</span>
+          <span className="text-[13px] font-medium">{totalPoints}</span>
         </div>
 
         <div className="mb-5 rounded-[20px] bg-[#F0997B] p-4 text-[#4A1B0C]">
@@ -116,10 +124,10 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
           )}
         </div>
 
-        <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7] shadow-[0_8px_18px_rgba(216,90,48,0.2)]">
+        <Link href="/goals/new" className="mt-5 flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7] shadow-[0_8px_18px_rgba(216,90,48,0.2)]">
           <span className="text-[18px]">＋</span>
           יעד חדש
-        </button>
+        </Link>
 
         {primaryGoal && (
           <div className="mt-5 rounded-[16px] border border-[#f0dfd4] bg-[#fff8f3] p-3">

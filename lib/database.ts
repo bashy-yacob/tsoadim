@@ -14,7 +14,7 @@ export type Goal = {
   user_id: string;
   type: GoalType;
   title: string;
-  category?: string;
+  category?: string | null;
   details: {
     start_value?: number;
     target_value?: number;

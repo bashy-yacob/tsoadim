@@ -1,11 +1,11 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase";
-import { goalHistory, initialGoals, profile as fallbackProfile } from "@/lib/mock-data";
 import type { GoalHistoryPoint, GoalRecord, ProfileRecord } from "@/types/goals";
 
 type SupabaseGoalRow = {
   id: string;
   title: string;
   type: GoalRecord["type"] | string;
+  category?: string | null;
   status: string;
   current_streak?: number | null;
   longest_streak?: number | null;
@@ -28,6 +28,7 @@ function toGoalRecord(row: SupabaseGoalRow): GoalRecord {
     id: row.id,
     title: row.title,
     type: (row.type as GoalRecord["type"]) || "quantitative",
+    category: row.category ?? null,
     status: row.status || "active",
     current_streak: Number(row.current_streak ?? 0),
     longest_streak: Number(row.longest_streak ?? 0),
@@ -41,10 +42,10 @@ function toGoalRecord(row: SupabaseGoalRow): GoalRecord {
 
 function toProfileRecord(row?: SupabaseProfileRow | null): ProfileRecord {
   return {
-    id: row?.id || fallbackProfile.id,
-    display_name: row?.display_name || fallbackProfile.display_name,
-    total_points: Number(row?.total_points ?? fallbackProfile.total_points),
-    avatar_url: row?.avatar_url || fallbackProfile.avatar_url || null,
+    id: row?.id || "",
+    display_name: row?.display_name || "",
+    total_points: Number(row?.total_points ?? 0),
+    avatar_url: row?.avatar_url || null,
   };
 }
 
@@ -52,7 +53,7 @@ export async function getDashboardData(): Promise<{ profile: ProfileRecord; goal
   const client = getSupabaseBrowserClient();
 
   if (!client) {
-    return { profile: fallbackProfile, goals: initialGoals };
+    return { profile: toProfileRecord(), goals: [] };
   }
 
   const {
@@ -61,7 +62,7 @@ export async function getDashboardData(): Promise<{ profile: ProfileRecord; goal
   } = await client.auth.getUser();
 
   if (userError || !user) {
-    return { profile: fallbackProfile, goals: initialGoals };
+    return { profile: toProfileRecord(), goals: [] };
   }
 
   const [{ data: profileData, error: profileError }, { data: goalsData, error: goalsError }] = await Promise.all([
@@ -70,22 +71,22 @@ export async function getDashboardData(): Promise<{ profile: ProfileRecord; goal
   ]);
 
   if (profileError && profileError.code !== "PGRST116") {
-    return { profile: fallbackProfile, goals: initialGoals };
+    return { profile: toProfileRecord(), goals: [] };
   }
 
   if (goalsError) {
-    return { profile: toProfileRecord(profileData), goals: initialGoals };
+    return { profile: toProfileRecord(profileData), goals: [] };
   }
 
-  const safeProfile = toProfileRecord(profileData) || fallbackProfile;
+  const safeProfile = toProfileRecord(profileData);
   const safeGoals = (goalsData ?? []).map(toGoalRecord);
 
   return {
     profile: {
       ...safeProfile,
-      display_name: safeProfile.display_name || user.user_metadata?.full_name || user.email?.split("@")[0] || fallbackProfile.display_name,
+      display_name: safeProfile.display_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "משתמש",
     },
-    goals: safeGoals.length > 0 ? safeGoals : initialGoals,
+    goals: safeGoals,
   };
 }
 
@@ -93,26 +94,27 @@ export async function getGoalById(goalId: string): Promise<{ goal: GoalRecord; c
   const client = getSupabaseBrowserClient();
 
   if (!client) {
-    const fallbackGoal = initialGoals.find((goal) => goal.id === goalId) ?? initialGoals[0];
-    return { goal: fallbackGoal, chartData: goalHistory[fallbackGoal.id] ?? [] };
+    return null;
   }
 
   const { data, error } = await (client.from("goals") as any).select("*").eq("id", goalId).maybeSingle();
 
   if (error || !data) {
-    const fallbackGoal = initialGoals.find((goal) => goal.id === goalId) ?? initialGoals[0];
-    return { goal: fallbackGoal, chartData: goalHistory[fallbackGoal.id] ?? [] };
+    return null;
   }
 
   const goal = toGoalRecord(data);
+  const { data: progressEntries } = await (client.from("progress_entries") as any)
+    .select("entry_date, value")
+    .eq("goal_id", goal.id)
+    .order("entry_date", { ascending: true });
 
   return {
     goal,
-    chartData: goalHistory[goal.id] ?? [
-      { date: "היום", value: goal.current_value },
-      { date: "שבוע", value: Math.max(goal.current_value * 0.8, 0) },
-      { date: "חודש", value: Math.max(goal.current_value * 1.2, 0) },
-    ],
+    chartData: (progressEntries ?? []).map((entry: { entry_date: string; value: number | null }) => ({
+      date: entry.entry_date,
+      value: Number(entry.value ?? 0),
+    })),
   };
 }
 

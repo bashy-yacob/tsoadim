@@ -4,6 +4,7 @@ export type GoalRecord = {
   id: string;
   title: string;
   type: GoalType;
+  category?: string | null;
   status: string;
   current_streak: number;
   longest_streak: number;
