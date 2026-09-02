@@ -68,16 +68,25 @@ const renderGoalCard = (goal: GoalRecord) => {
       aria-label={`פתיחת היעד ${goal.title}`}
       className="flex items-center gap-3 rounded-[16px] bg-[#f6f0eb] p-3 shadow-[inset_0_0_0_1px_rgba(96,65,52,0.06)]"
     >
-      <div
-        className="relative flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full"
-        style={{
-          background: `conic-gradient(#D85A30 0% ${percent}%, #F5EEE8 ${percent}% 100%)`,
-        }}
-      >
-        <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#f6f0eb] text-[10px] font-medium text-[#D85A30]">
-          {percent}%
+      {goal.type === "streak" ? (
+        <div
+          className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-[#F0997B] text-[20px]"
+          aria-label={`${goal.current_streak} ימים ברצף`}
+        >
+          🔥
         </div>
-      </div>
+      ) : (
+        <div
+          className="relative flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full"
+          style={{
+            background: `conic-gradient(#D85A30 0% ${percent}%, #F5EEE8 ${percent}% 100%)`,
+          }}
+        >
+          <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#f6f0eb] text-[10px] font-medium text-[#D85A30]">
+            {percent}%
+          </div>
+        </div>
+      )}
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-medium text-[#2d120b]">{goal.title}</p>
         <p className="mt-1 text-[12px] text-[#6b5346]">{progressText}</p>
@@ -123,6 +132,12 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
             </div>
           )}
         </div>
+
+        {goals.length > 2 && (
+          <Link href="/goals" className="mt-3 block text-center text-[13px] font-medium text-[#D85A30]">
+            לכל היעדים ({goals.length})
+          </Link>
+        )}
 
         <Link href="/goals/new" className="mt-5 flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7] shadow-[0_8px_18px_rgba(216,90,48,0.2)]">
           <span className="text-[18px]">＋</span>

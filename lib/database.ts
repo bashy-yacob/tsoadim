@@ -254,6 +254,32 @@ export async function getProgressEntries(goalId: string): Promise<ProgressEntry[
   return data as ProgressEntry[];
 }
 
+export async function getLatestProgressEntries(goalIds: string[]): Promise<Map<string, ProgressEntry>> {
+  const latestEntries = new Map<string, ProgressEntry>();
+  if (goalIds.length === 0) return latestEntries;
+
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return latestEntries;
+
+  const { data, error } = await (supabase.from("progress_entries") as any)
+    .select("*")
+    .in("goal_id", goalIds)
+    .order("entry_date", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching latest progress entries:", error);
+    return latestEntries;
+  }
+
+  for (const entry of (data ?? []) as ProgressEntry[]) {
+    if (!latestEntries.has(entry.goal_id)) {
+      latestEntries.set(entry.goal_id, entry);
+    }
+  }
+
+  return latestEntries;
+}
+
 export async function addProgressEntry(
   goalId: string,
   value?: number,
@@ -262,6 +288,17 @@ export async function addProgressEntry(
 ): Promise<ProgressEntry | null> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return null;
+
+  const [{ data: goal, error: goalError }, { data: existingEntry, error: existingEntryError }, { data: profile, error: profileError }] = await Promise.all([
+    (supabase.from("goals") as any).select("id, user_id, type, current_streak, longest_streak, status").eq("id", goalId).single(),
+    (supabase.from("progress_entries") as any).select("id").eq("goal_id", goalId).eq("entry_date", entryDate).maybeSingle(),
+    (supabase.from("profiles") as any).select("total_points").eq("id", (await supabase.auth.getUser()).data.user?.id ?? "").maybeSingle(),
+  ]);
+
+  if (goalError || existingEntryError || profileError || !goal) {
+    console.error("Error preparing progress entry:", goalError || existingEntryError || profileError);
+    return null;
+  }
 
   const { data, error } = await (supabase.from("progress_entries") as any)
     .upsert({
@@ -276,6 +313,62 @@ export async function addProgressEntry(
   if (error) {
     console.error("Error adding progress entry:", error);
     return null;
+  }
+
+  if (!existingEntry) {
+    const { data: entries, error: entriesError } = await (supabase.from("progress_entries") as any)
+      .select("entry_date")
+      .eq("goal_id", goalId)
+      .order("entry_date", { ascending: false });
+
+    if (entriesError) {
+      console.error("Error calculating streak:", entriesError);
+      return data as ProgressEntry;
+    }
+
+    if (goal.type === "streak") {
+      const entryDates = new Set((entries ?? []).map((entry: { entry_date: string }) => entry.entry_date));
+      let currentStreak = 0;
+      const date = new Date(`${entryDate}T00:00:00Z`);
+
+      while (entryDates.has(date.toISOString().split("T")[0])) {
+        currentStreak += 1;
+        date.setUTCDate(date.getUTCDate() - 1);
+      }
+
+      const longestStreak = Math.max(Number(goal.longest_streak ?? 0), currentStreak);
+      const { error: goalUpdateError } = await (supabase.from("goals") as any)
+        .update({ current_streak: currentStreak, longest_streak: longestStreak })
+        .eq("id", goalId);
+
+      if (goalUpdateError) {
+        console.error("Error updating goal streak:", goalUpdateError);
+      }
+    }
+
+    const points = goal.type === "milestone"
+      ? XP_VALUES.MILESTONE_COMPLETION
+      : calculateXPForEntry(goal as Goal, data as ProgressEntry);
+
+    if (goal.type === "milestone") {
+      const { error: completionError } = await (supabase.from("goals") as any)
+        .update({ status: "completed", completed_at: new Date().toISOString() })
+        .eq("id", goalId);
+
+      if (completionError) {
+        console.error("Error completing milestone:", completionError);
+      }
+    }
+
+    if (points > 0) {
+      const { error: pointsError } = await (supabase.from("profiles") as any)
+        .update({ total_points: Number(profile?.total_points ?? 0) + points })
+        .eq("id", goal.user_id);
+
+      if (pointsError) {
+        console.error("Error updating profile points:", pointsError);
+      }
+    }
   }
 
   return data as ProgressEntry;

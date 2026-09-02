@@ -9,12 +9,18 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { signUpWithEmail, signInWithEmail, signInWithGoogle } from "@/lib/auth";
+import {
+  resetPassword,
+  signUpWithEmail,
+  signInWithEmail,
+  signInWithGoogle,
+} from "@/lib/auth";
 
 export function AuthScreen() {
   const router = useRouter();
   const submitLockRef = useRef(false);
   const [mode, setMode] = useState<"signup" | "signin">("signup");
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,6 +39,17 @@ export function AuthScreen() {
     setIsSubmitting(true);
 
     try {
+      if (isForgotPassword) {
+        const result = await resetPassword(email);
+        if (!result.success) {
+          setError(result.error || "לא ניתן לאפס סיסמה");
+          return;
+        }
+
+        setError("נשלח אליכם אימייל עם קישור לאיפוס הסיסמה.");
+        return;
+      }
+
       if (mode === "signup") {
         if (!displayName.trim()) {
           setError("שם תצוגה הוא חובה");
@@ -102,7 +119,7 @@ export function AuthScreen() {
             <IconArrowLeft size={20} className="text-[#6B6459]" />
           </Link>
           <h1 className="text-[20px] font-medium text-[#1F1B16]">
-            {mode === "signup" ? "הרשמה" : "התחברות"}
+            {isForgotPassword ? "איפוס סיסמה" : mode === "signup" ? "הרשמה" : "התחברות"}
           </h1>
         </div>
 
@@ -112,10 +129,12 @@ export function AuthScreen() {
             <IconTargetArrow size={32} className="text-[#B94A26]" />
           </div>
           <h2 className="mb-2 text-[22px] font-medium text-[#1F1B16]">
-            {mode === "signup" ? "בואו נתחיל להתקדם" : "חזרו לצועדים"}
+            {isForgotPassword ? "נחזיר אתכם לצעדים" : mode === "signup" ? "בואו נתחיל להתקדם" : "חזרו לצועדים"}
           </h2>
           <p className="text-[14px] leading-6 text-[#6B6459]">
-            {mode === "signup"
+            {isForgotPassword
+              ? "הזינו את כתובת הדוא״ל שלכם ונשלח לכם קישור לאיפוס הסיסמה"
+              : mode === "signup"
               ? "רשמו יעדים, עקבו אחרי התקדמות, חגגו הישגים עם קהילה"
               : "התחברו כדי לראות את יעדיכם והתקדמותכם"}
           </p>
@@ -131,7 +150,7 @@ export function AuthScreen() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="mb-6 space-y-4">
-          {mode === "signup" && (
+          {mode === "signup" && !isForgotPassword && (
             <div>
               <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
                 שם תצוגה
@@ -161,7 +180,7 @@ export function AuthScreen() {
             />
           </div>
 
-          <div>
+          {!isForgotPassword && <div>
             <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
               סיסמה
             </label>
@@ -173,7 +192,7 @@ export function AuthScreen() {
               className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 text-[14px] outline-none focus:border-[#D85A30] transition-colors"
               disabled={isSubmitting}
             />
-          </div>
+          </div>}
 
           <button
             type="submit"
@@ -182,41 +201,61 @@ export function AuthScreen() {
           >
             {isSubmitting
               ? "טוען..."
+              : isForgotPassword
+              ? "שלחו לי קישור לאיפוס"
               : mode === "signup"
               ? "הרשם בחינם"
               : "התחבר"}
           </button>
         </form>
 
+        {!isForgotPassword && mode === "signin" && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsForgotPassword(true);
+              setError(null);
+            }}
+            className="mb-6 w-full text-center text-[13px] font-medium text-[#D85A30] hover:underline"
+          >
+            שכחתם את הסיסמה? קורה לכולם
+          </button>
+        )}
+
         {/* Divider */}
-        <div className="mb-6 flex items-center gap-3">
+        {!isForgotPassword && <div className="mb-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-[#E5E1D8]" />
           <span className="text-[12px] text-[#9C9585]">או</span>
           <div className="h-px flex-1 bg-[#E5E1D8]" />
-        </div>
+        </div>}
 
         {/* Google Sign In */}
-        <button
+        {!isForgotPassword && <button
           onClick={handleGoogleSignIn}
           disabled={isSubmitting}
           className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 flex items-center justify-center gap-2 text-[14px] font-medium text-[#1F1B16] transition-colors hover:bg-[#F5F3EF] disabled:opacity-60"
         >
           <IconBrandGoogle size={18} />
           <span>התחברות עם Google</span>
-        </button>
+        </button>}
 
         {/* Mode Toggle */}
         <div className="mt-6 text-center">
           <p className="text-[13px] text-[#6B6459]">
-            {mode === "signup" ? "יש לכם חשבון?" : "אין לכם חשבון?"}
+            {isForgotPassword ? "נזכרתם בסיסמה?" : mode === "signup" ? "יש לכם חשבון?" : "אין לכם חשבון?"}
             <button
               onClick={() => {
-                setMode(mode === "signup" ? "signin" : "signup");
+                if (isForgotPassword) {
+                  setIsForgotPassword(false);
+                  setMode("signin");
+                } else {
+                  setMode(mode === "signup" ? "signin" : "signup");
+                }
                 setError(null);
               }}
               className="mr-1 font-medium text-[#D85A30] hover:underline"
             >
-              {mode === "signup" ? "התחברו" : "הרשמו"}
+              {isForgotPassword ? "חזרו להתחברות" : mode === "signup" ? "התחברו" : "הרשמו"}
             </button>
           </p>
         </div>

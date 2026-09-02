@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IconCheck,
   IconEdit,
   IconArrowRight,
 } from "@tabler/icons-react";
@@ -10,6 +11,7 @@ import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ScreenShell } from "@/components/screen-shell";
 import { StreakTimer } from "@/components/streak-timer";
+import { addProgressEntry } from "@/lib/database";
 import { getGoalById } from "@/lib/supabase-data";
 import type { GoalHistoryPoint, GoalRecord } from "@/types/goals";
 
@@ -41,6 +43,9 @@ export default function GoalDetailsPage() {
   const params = useParams<{ id: string }>();
   const [goal, setGoal] = useState<GoalRecord | null>(null);
   const [chartData, setChartData] = useState<GoalHistoryPoint[]>([]);
+  const [progressValue, setProgressValue] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -68,6 +73,31 @@ export default function GoalDetailsPage() {
   }
 
   const progress = Math.round(getGoalProgress(goal));
+  const today = new Date().toISOString().split("T")[0];
+  const completedToday = chartData.some((item) => item.date === today);
+
+  const handleProgressUpdate = async () => {
+    if (isUpdating || (goal.type === "streak" && completedToday) || goal.is_completed) return;
+
+    const value = goal.type === "quantitative" ? Number(progressValue) : 1;
+    if (goal.type === "quantitative" && (!progressValue || Number.isNaN(value))) {
+      setUpdateMessage("הזיני ערך כדי לעדכן את ההתקדמות");
+      return;
+    }
+
+    setIsUpdating(true);
+    setUpdateMessage(null);
+    const entry = await addProgressEntry(goal.id, value);
+    setIsUpdating(false);
+
+    if (!entry) {
+      setUpdateMessage("לא ניתן לשמור את העדכון");
+      return;
+    }
+
+    setUpdateMessage(goal.type === "streak" ? "סומן להיום וקיבלת ניקוד" : "ההתקדמות נשמרה וקיבלת ניקוד");
+    window.location.reload();
+  };
 
   return (
     <ScreenShell>
@@ -133,9 +163,31 @@ export default function GoalDetailsPage() {
         ))}
       </div>
 
-      <button type="button" className="w-full rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7]">
-        עדכון התקדמות
+      {goal.type === "quantitative" && (
+        <input
+          type="number"
+          value={progressValue}
+          onChange={(event) => setProgressValue(event.target.value)}
+          placeholder={`כמה השלמת הפעם? (${goal.details?.unit ?? ""})`}
+          className="mb-2 w-full rounded-[12px] border border-[#e8d7cd] bg-[#fffaf6] px-4 py-3 text-[14px] outline-none focus:border-[#D85A30]"
+          disabled={isUpdating}
+        />
+      )}
+
+      <button
+        type="button"
+        onClick={handleProgressUpdate}
+        disabled={isUpdating || (goal.type === "streak" && completedToday) || goal.is_completed}
+        className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7] disabled:opacity-50"
+      >
+        <IconCheck size={18} />
+        {goal.type === "streak"
+          ? completedToday ? "בוצע היום" : "סמן שעשיתי את זה היום"
+          : goal.type === "milestone"
+            ? goal.is_completed ? "היעד הושלם" : "סמן כהושלם"
+            : "עדכון התקדמות"}
       </button>
+      {updateMessage && <p className="mt-2 text-center text-[12px] text-[#6b5346]">{updateMessage}</p>}
     </ScreenShell>
   );
 }

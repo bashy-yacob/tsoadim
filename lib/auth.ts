@@ -309,6 +309,13 @@ export async function updatePassword(newPassword: string): Promise<{
     return { success: false, error: "Supabase not configured" };
   }
 
+  if (!isStrongPassword(newPassword)) {
+    return {
+      success: false,
+      error: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה ומספר",
+    };
+  }
+
   try {
     const { error } = await supabase.auth.updateUser({
       password: newPassword,

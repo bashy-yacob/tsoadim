@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardScreen } from "@/components/dashboard-screen";
 import { getCurrentUser } from "@/lib/auth";
-import { getGoals, getProfile, getProgressEntries } from "@/lib/database";
+import { getGoals, getLatestProgressEntries, getProfile } from "@/lib/database";
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
 
 export default function DashboardPage() {
@@ -28,8 +28,8 @@ export default function DashboardPage() {
         getProfile(user.id),
         getGoals(user.id),
       ]);
-      const progressEntries = await Promise.all(
-        goalsData.map((goal) => getProgressEntries(goal.id))
+      const latestProgressEntries = await getLatestProgressEntries(
+        goalsData.map((goal) => goal.id)
       );
 
       if (!isMounted) return;
@@ -46,7 +46,7 @@ export default function DashboardPage() {
       );
 
       setGoals(
-        goalsData.map((goal, index) => ({
+        goalsData.map((goal) => ({
           id: goal.id,
           title: goal.title,
           type: goal.type,
@@ -58,7 +58,7 @@ export default function DashboardPage() {
           completed_at: goal.completed_at ?? null,
           details: goal.details ?? {},
           current_value: Number(
-            progressEntries[index][0]?.value ?? goal.details?.start_value ?? 0
+            latestProgressEntries.get(goal.id)?.value ?? goal.details?.start_value ?? 0
           ),
           is_completed: goal.status === "completed",
         }))
@@ -76,10 +76,15 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f4efe9] text-[#2d120b]" dir="rtl">
-        <div className="text-center">
-          <div className="mb-3 text-[18px] font-medium">טוען את לוח הבקרה...</div>
-          <div className="text-[14px] text-[#6b5346]">מייבא נתונים מה-Supabase</div>
+      <main className="min-h-screen bg-[#f4efe9] px-4 py-6" dir="rtl" aria-busy="true">
+        <div className="mx-auto max-w-[900px] animate-pulse">
+          <div className="mb-8 h-10 w-48 rounded-[12px] bg-[#e5d8cf]" />
+          <div className="mb-6 grid gap-4 md:grid-cols-3">
+            <div className="h-28 rounded-[16px] bg-[#eaded6]" />
+            <div className="h-28 rounded-[16px] bg-[#eaded6]" />
+            <div className="h-28 rounded-[16px] bg-[#eaded6]" />
+          </div>
+          <div className="h-48 rounded-[16px] bg-[#eaded6]" />
         </div>
       </main>
     );
