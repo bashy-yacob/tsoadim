@@ -144,7 +144,7 @@ export function StreakTimer({ goalId, durationMinutes, onCompleted }: StreakTime
       <div className="mb-3 h-[7px] overflow-hidden rounded-full bg-[#f0dfd5]">
         <div className="h-full rounded-full bg-[#D85A30] transition-[width]" style={{ width: `${progressPercent}%` }} />
       </div>
-      <p className="mb-3 text-center text-[12px] text-[#6b5346]">התקדמות האימון: {progressPercent}%</p>
+      <p className="mb-3 text-center text-[12px] text-[#6b5346]">עוד צעד קטן: {progressPercent}%</p>
       <div className="flex gap-2">
         <button
           type="button"
@@ -152,7 +152,7 @@ export function StreakTimer({ goalId, durationMinutes, onCompleted }: StreakTime
           disabled={isSaving || secondsLeft === 0}
           className="flex-1 rounded-[10px] bg-[#D85A30] px-3 py-2 text-[13px] font-medium text-white disabled:opacity-50"
         >
-          {isRunning ? "השהה" : "התחל"}
+          {isRunning ? "השהה" : "התחל לצעוד"}
         </button>
         <button
           type="button"
@@ -160,7 +160,7 @@ export function StreakTimer({ goalId, durationMinutes, onCompleted }: StreakTime
           disabled={isSaving}
           className="rounded-[10px] bg-[#f0dfd5] px-3 py-2 text-[13px] font-medium text-[#2d120b] disabled:opacity-50"
         >
-          איפוס
+          התחלה מחדש
         </button>
       </div>
       {message && <p className="mt-2 text-center text-[12px] text-[#6b5346]">{message}</p>}

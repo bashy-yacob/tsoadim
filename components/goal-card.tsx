@@ -1,15 +1,14 @@
 "use client";
 
-import { IconChevronLeft, IconTrash, IconEdit } from "@tabler/icons-react";
+import { IconChevronLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import { Goal } from "@/lib/database";
 
 interface GoalCardProps {
   goal: Goal;
-  onDelete?: (goalId: string) => void;
 }
 
-export function GoalCard({ goal, onDelete }: GoalCardProps) {
+export function GoalCard({ goal }: GoalCardProps) {
   const getProgressPercentage = (): number => {
     if (goal.type === "quantitative") {
       const start = goal.details.start_value || 0;
@@ -74,10 +73,7 @@ export function GoalCard({ goal, onDelete }: GoalCardProps) {
     } else if (goal.type === "milestone") {
       if (goal.status === "completed") return "✅ הושלם";
       const dueDate = new Date(goal.details.due_date || "");
-      const daysLeft = Math.ceil(
-        (dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-      );
-      return `${daysLeft} ימים נותרו`;
+      return dueDate.toLocaleDateString("he-IL");
     }
     return "";
   };

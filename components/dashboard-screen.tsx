@@ -106,10 +106,7 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
       <div className="w-full max-w-[420px] rounded-[30px] border border-[#e8d7cd] bg-[#fffaf6] p-4 shadow-[0_20px_50px_rgba(86,45,23,0.08)]" dir="rtl">
         <div className="mb-5 flex items-center justify-between gap-3">
           <p className="text-[20px] font-medium text-[#2d120b]">היי {profile?.display_name ?? "משתמש"} 👋</p>
-          <div className="flex items-center gap-2">
-            <Link href="/leaderboard" className="rounded-full bg-[#f6f0eb] px-3 py-2 text-[12px] text-[#6b5346]">לוח מנצחים</Link>
-            <Link href="/settings" className="rounded-full bg-[#f6f0eb] px-3 py-2 text-[12px] text-[#6b5346]">הגדרות</Link>
-          </div>
+          <span className="text-[12px] text-[#6b5346]">כל צעד נחשב</span>
         </div>
 
         <div className="mb-5 flex items-center justify-between rounded-[12px] bg-[#FAC775] px-3 py-2 text-[#412402]">
@@ -128,7 +125,7 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
         <div className="space-y-3">
           {goals.length > 0 ? goals.slice(0, 2).map(renderGoalCard) : (
             <div className="rounded-[16px] border border-dashed border-[#d8c2b4] bg-[#fff7f1] p-4 text-center text-[13px] text-[#6b5346]">
-              עדיין אין יעדים פעילים. בוא ניצור את הראשון שלך.
+              המקום הזה מחכה ליעד הראשון שלך
             </div>
           )}
         </div>

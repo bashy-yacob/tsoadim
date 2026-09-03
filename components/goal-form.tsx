@@ -194,7 +194,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
             <IconArrowLeft size={20} className="text-[#6B6459]" />
           </Link>
           <h1 className="text-[24px] font-medium text-[#1F1B16]">
-            {isEditMode ? "עריכת יעד" : "יעד חדש"}
+            {isEditMode ? "ערוך יעד" : "מה הפעם?"}
           </h1>
         </div>
 
@@ -211,7 +211,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="mb-3 block text-[13px] font-medium text-[#1F1B16]">
-              סוג היעד
+              איזה סוג יעד זה?
             </label>
             <div className="grid gap-3 sm:grid-cols-3">
               {[
@@ -238,13 +238,13 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
 
           <div>
             <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-              שם היעד
+              איך נקרא לזה?
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="למשל: לרוץ 50 ק״מ"
+              placeholder="למשל: לרוץ 5 ק״מ"
               className="w-full rounded-[12px] border border-[#E5E1D8] bg-white px-4 py-3 text-[14px] outline-none transition-colors focus:border-[#D85A30]"
               disabled={isSubmitting}
             />
@@ -273,7 +273,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-                    ערך התחלתי
+                    מתחילים מ־
                   </label>
                   <input
                     type="number"
@@ -287,7 +287,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
                 </div>
                 <div>
                   <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-                    ערך יעד
+                    מגיעים עד
                   </label>
                   <input
                     type="number"
@@ -352,7 +352,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
 
               <div>
                 <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-                  משך בדקות
+                    משך בדקות (אופציונלי)
                 </label>
                 <input
                   type="number"
@@ -369,7 +369,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
           {goalType === "milestone" && (
             <div>
               <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-                תאריך יעד
+                עד מתי? (אופציונלי)
               </label>
               <input
                 type="date"
@@ -386,7 +386,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
             disabled={isSubmitting}
             className="w-full rounded-[12px] bg-[#D85A30] px-4 py-3 text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           >
-            {isSubmitting ? "שומר..." : isEditMode ? "שמור שינויים" : "שמור יעד"}
+            {isSubmitting ? "שומרים..." : isEditMode ? "שמור שינויים" : "שמור יעד"}
           </button>
         </form>
         )}

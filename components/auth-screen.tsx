@@ -119,7 +119,7 @@ export function AuthScreen() {
             <IconArrowLeft size={20} className="text-[#6B6459]" />
           </Link>
           <h1 className="text-[20px] font-medium text-[#1F1B16]">
-            {isForgotPassword ? "איפוס סיסמה" : mode === "signup" ? "הרשמה" : "התחברות"}
+            {isForgotPassword ? "איפוס סיסמה" : mode === "signup" ? "רגע לפני שנתחיל" : "טוב לראות אותך שוב"}
           </h1>
         </div>
 
@@ -129,14 +129,14 @@ export function AuthScreen() {
             <IconTargetArrow size={32} className="text-[#B94A26]" />
           </div>
           <h2 className="mb-2 text-[22px] font-medium text-[#1F1B16]">
-            {isForgotPassword ? "נחזיר אתכם לצעדים" : mode === "signup" ? "בואו נתחיל להתקדם" : "חזרו לצועדים"}
+            {isForgotPassword ? "נחזיר אותך לצועדים" : mode === "signup" ? "בואו נתחיל לצעוד" : "חזרו לצועדים"}
           </h2>
           <p className="text-[14px] leading-6 text-[#6B6459]">
             {isForgotPassword
               ? "הזינו את כתובת הדוא״ל שלכם ונשלח לכם קישור לאיפוס הסיסמה"
               : mode === "signup"
-              ? "רשמו יעדים, עקבו אחרי התקדמות, חגגו הישגים עם קהילה"
-              : "התחברו כדי לראות את יעדיכם והתקדמותכם"}
+              ? "רשמו יעדים, עקבו אחרי ההתקדמות, וחגגו כל צעד"
+              : "היעדים שלך עדיין כאן ומחכים לך"}
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export function AuthScreen() {
           {mode === "signup" && !isForgotPassword && (
             <div>
               <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-                שם תצוגה
+                איך קוראים לך?
               </label>
               <input
                 type="text"
@@ -168,7 +168,7 @@ export function AuthScreen() {
 
           <div>
             <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-              דוא״ל
+                אימייל (לא נשלח ספאם, מבטיחים)
             </label>
             <input
               type="email"
@@ -182,7 +182,7 @@ export function AuthScreen() {
 
           {!isForgotPassword && <div>
             <label className="mb-2 block text-[13px] font-medium text-[#1F1B16]">
-              סיסמה
+                סיסמה (8 תווים ומעלה – כן, שוב)
             </label>
             <input
               type="password"
@@ -204,8 +204,8 @@ export function AuthScreen() {
               : isForgotPassword
               ? "שלחו לי קישור לאיפוס"
               : mode === "signup"
-              ? "הרשם בחינם"
-              : "התחבר"}
+              ? "צור חשבון"
+              : "היכנס/י"}
           </button>
         </form>
 
