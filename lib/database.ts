@@ -29,6 +29,7 @@ export type Goal = {
   status: "active" | "completed" | "archived";
   created_at: string;
   completed_at?: string;
+  current_value?: number;
 };
 
 export type ProgressEntry = {
@@ -146,7 +147,31 @@ export async function getGoals(userId: string): Promise<Goal[]> {
     return [];
   }
 
-  return data as Goal[];
+  const goals = data as Goal[];
+  if (goals.length === 0) return goals;
+
+  const { data: progressEntries, error: progressError } = await (supabase.from("progress_entries") as any)
+    .select("goal_id, value, entry_date, created_at")
+    .in("goal_id", goals.map((goal) => goal.id))
+    .order("entry_date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (progressError) {
+    console.error("Error fetching goal progress:", progressError);
+    return goals;
+  }
+
+  const latestValues = new Map<string, number>();
+  for (const entry of (progressEntries ?? []) as Array<{ goal_id: string; value: number | null }>) {
+    if (!latestValues.has(entry.goal_id)) {
+      latestValues.set(entry.goal_id, Number(entry.value ?? 0));
+    }
+  }
+
+  return goals.map((goal) => ({
+    ...goal,
+    current_value: latestValues.get(goal.id) ?? Number(goal.details?.start_value ?? 0),
+  }));
 }
 
 export async function getGoal(goalId: string): Promise<Goal | null> {
@@ -264,7 +289,8 @@ export async function getLatestProgressEntries(goalIds: string[]): Promise<Map<s
   const { data, error } = await (supabase.from("progress_entries") as any)
     .select("*")
     .in("goal_id", goalIds)
-    .order("entry_date", { ascending: false });
+    .order("entry_date", { ascending: false })
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching latest progress entries:", error);

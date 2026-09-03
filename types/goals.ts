@@ -31,6 +31,7 @@ export type ProfileRecord = {
 };
 
 export type GoalHistoryPoint = {
+  id?: string;
   date: string;
   value: number;
 };

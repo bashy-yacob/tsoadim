@@ -105,13 +105,20 @@ export async function getGoalById(goalId: string): Promise<{ goal: GoalRecord; c
 
   const goal = toGoalRecord(data);
   const { data: progressEntries } = await (client.from("progress_entries") as any)
-    .select("entry_date, value")
+    .select("id, entry_date, value, created_at")
     .eq("goal_id", goal.id)
-    .order("entry_date", { ascending: true });
+    .order("entry_date", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  const latestProgressEntry = progressEntries?.[progressEntries.length - 1];
 
   return {
-    goal,
-    chartData: (progressEntries ?? []).map((entry: { entry_date: string; value: number | null }) => ({
+    goal: {
+      ...goal,
+      current_value: Number(latestProgressEntry?.value ?? goal.details.start_value ?? 0),
+    },
+    chartData: (progressEntries ?? []).map((entry: { id: string; entry_date: string; value: number | null }) => ({
+      id: entry.id,
       date: entry.entry_date,
       value: Number(entry.value ?? 0),
     })),

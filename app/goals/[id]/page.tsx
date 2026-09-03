@@ -168,8 +168,8 @@ export default function GoalDetailsPage() {
 
       <div className="mb-5 rounded-[16px] bg-[#fff6f1] p-3">
         <p className="mb-3 text-[13px] text-[#6b5346]">הדרך עד עכשיו</p>
-        {chartData.map((item: GoalHistoryPoint) => (
-          <div key={item.date} className="flex items-center justify-between border-b border-[#f0dfd5] py-2 last:border-b-0">
+        {chartData.map((item: GoalHistoryPoint, index) => (
+          <div key={item.id ?? `${item.date}-${index}`} className="flex items-center justify-between border-b border-[#f0dfd5] py-2 last:border-b-0">
             <span className="text-[13px] text-[#6b5346]">{item.date}</span>
             <span className="text-[13px] font-medium text-[#2d120b]">
               {goal.type === "quantitative" ? `${item.value} ${goal.details?.unit ?? ""}` : `${item.value} ${goal.type === "streak" ? "דק'" : "השלמות"}`}
