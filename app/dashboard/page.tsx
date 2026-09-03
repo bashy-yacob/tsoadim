@@ -77,7 +77,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <main className="min-h-screen bg-[#f4efe9] px-4 py-6" dir="rtl" aria-busy="true">
-        <div className="mx-auto max-w-[900px] animate-pulse">
+        <div className="mx-auto w-full max-w-[420px] animate-pulse rounded-[30px] border border-[#e8d7cd] bg-[#fffaf6] p-4">
           <div className="mb-8 h-10 w-48 rounded-[12px] bg-[#e5d8cf]" />
           <div className="mb-6 grid gap-4 md:grid-cols-3">
             <div className="h-28 rounded-[16px] bg-[#eaded6]" />

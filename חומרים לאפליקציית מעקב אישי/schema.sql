@@ -49,7 +49,8 @@ create table progress_entries (
   entry_date date not null default current_date,
   note text,
   created_at timestamptz not null default now(),
-  unique(goal_id, entry_date) -- רשומה אחת ליום ליעד (ניתן לעדכן אותה)
+  -- יעד כמותי יכול לקבל כמה עדכונים ביום.
+  -- יעד סטריק יומי נאכף באפליקציה: עדכון אחד לכל יום.
 );
 
 create index idx_progress_goal_date on progress_entries(goal_id, entry_date desc);

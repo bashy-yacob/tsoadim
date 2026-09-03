@@ -290,7 +290,7 @@ export async function addProgressEntry(
   if (!supabase) return null;
 
   const [{ data: goal, error: goalError }, { data: existingEntry, error: existingEntryError }, { data: profile, error: profileError }] = await Promise.all([
-    (supabase.from("goals") as any).select("id, user_id, type, current_streak, longest_streak, status").eq("id", goalId).single(),
+    (supabase.from("goals") as any).select("id, user_id, type, details, current_streak, longest_streak, status").eq("id", goalId).single(),
     (supabase.from("progress_entries") as any).select("id").eq("goal_id", goalId).eq("entry_date", entryDate).maybeSingle(),
     (supabase.from("profiles") as any).select("total_points").eq("id", (await supabase.auth.getUser()).data.user?.id ?? "").maybeSingle(),
   ]);
@@ -300,10 +300,15 @@ export async function addProgressEntry(
     return null;
   }
 
+  const isDailyStreak = goal.type === "streak" && goal.details?.frequency !== "weekly";
+  if (isDailyStreak && existingEntry) {
+    return null;
+  }
+
   const { data, error } = await (supabase.from("progress_entries") as any)
-    .upsert({
+    .insert({
       goal_id: goalId,
-      value: value || null,
+      value: value ?? null,
       entry_date: entryDate,
       note: note || null,
     })
@@ -315,7 +320,7 @@ export async function addProgressEntry(
     return null;
   }
 
-  if (!existingEntry) {
+  if (!existingEntry || goal.type !== "streak") {
     const { data: entries, error: entriesError } = await (supabase.from("progress_entries") as any)
       .select("entry_date")
       .eq("goal_id", goalId)

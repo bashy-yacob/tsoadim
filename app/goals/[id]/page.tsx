@@ -67,17 +67,32 @@ export default function GoalDetailsPage() {
   if (!goal) {
     return (
       <ScreenShell>
-        <p className="text-[14px] text-[#6b5346]">טוען את נתוני היעד...</p>
+        <div className="animate-pulse" aria-busy="true" aria-label="טוענים את היעד">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-[#f0dfd5]" />
+            <div className="h-5 w-40 rounded-full bg-[#eaded6]" />
+            <div className="mr-auto h-9 w-9 rounded-full bg-[#f0dfd5]" />
+          </div>
+          <div className="mb-5 h-9 w-48 rounded-full bg-[#eaded6]" />
+          <div className="mb-5 h-2 rounded-full bg-[#f0dfd5]" />
+          <div className="mb-5 h-[180px] rounded-[16px] bg-[#fff1e9]" />
+          <div className="rounded-[16px] bg-[#fff1e9] p-4">
+            <div className="mb-4 h-4 w-24 rounded-full bg-[#eaded6]" />
+            <div className="mb-3 h-4 rounded-full bg-[#eaded6]" />
+            <div className="h-4 w-3/4 rounded-full bg-[#eaded6]" />
+          </div>
+        </div>
       </ScreenShell>
     );
   }
 
   const progress = Math.round(getGoalProgress(goal));
   const today = new Date().toISOString().split("T")[0];
-  const completedToday = chartData.some((item) => item.date === today);
+  const isDailyStreak = goal.type === "streak" && goal.details.frequency !== "weekly";
+  const completedToday = isDailyStreak && chartData.some((item) => item.date === today);
 
   const handleProgressUpdate = async () => {
-    if (isUpdating || (goal.type === "streak" && completedToday) || goal.is_completed) return;
+    if (isUpdating || (isDailyStreak && completedToday) || goal.is_completed) return;
 
     const value = goal.type === "quantitative" ? Number(progressValue) : 1;
     if (goal.type === "quantitative" && (!progressValue || Number.isNaN(value))) {
@@ -177,7 +192,7 @@ export default function GoalDetailsPage() {
       <button
         type="button"
         onClick={handleProgressUpdate}
-        disabled={isUpdating || (goal.type === "streak" && completedToday) || goal.is_completed}
+        disabled={isUpdating || (isDailyStreak && completedToday) || goal.is_completed}
         className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7] disabled:opacity-50"
       >
         <IconCheck size={18} />

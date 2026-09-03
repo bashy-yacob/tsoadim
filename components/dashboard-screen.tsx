@@ -1,6 +1,6 @@
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
 import Link from "next/link";
-import { IconFlame, IconPlus } from "@tabler/icons-react";
+import { IconBolt, IconClock, IconFlame, IconPlus } from "@tabler/icons-react";
 
 type DashboardScreenProps = {
   profile?: ProfileRecord | null;
@@ -34,18 +34,46 @@ const goalProgress = (goal: GoalRecord) => {
   return goal.is_completed ? 100 : 0;
 };
 
-const goalBadge = (goal: GoalRecord) => {
-  if (goal.type === "quantitative") {
-    const target = Number(goal.details?.target_value ?? 0);
-    const current = Number(goal.current_value ?? 0);
-    return `${formatValue(current, goal.details?.unit)} / ${formatValue(target, goal.details?.unit)}`;
-  }
+// A streak goal with a duration attached (e.g. "10 min daily workout") gets a
+// clock icon instead of the flame, so it visually reads as "timed" — adjust
+// the `details` key below to whatever your schema actually calls this field.
+const isTimedStreak = (goal: GoalRecord) =>
+  goal.type === "streak" && Boolean(goal.details?.duration_minutes);
 
+const renderGoalIcon = (goal: GoalRecord, percent: number) => {
   if (goal.type === "streak") {
-    return `${goal.current_streak} ימים ברצף`;
+    if (isTimedStreak(goal)) {
+      return (
+        <div
+          className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-[#FAC775] text-[#633806]"
+          aria-label={`יעד עם משך זמן, ${goal.current_streak} ימים ברצף`}
+        >
+          <IconClock size={20} />
+        </div>
+      );
+    }
+    return (
+      <div
+        className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-[#F0997B] text-[20px]"
+        aria-label={`${goal.current_streak} ימים ברצף`}
+      >
+        🔥
+      </div>
+    );
   }
 
-  return goal.is_completed ? "הושלם" : "באבן דרך";
+  return (
+    <div
+      className="relative flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full"
+      style={{
+        background: `conic-gradient(#D85A30 0% ${percent}%, #F5EEE8 ${percent}% 100%)`,
+      }}
+    >
+      <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#f6f0eb] text-[10px] font-medium text-[#D85A30]">
+        {percent}%
+      </div>
+    </div>
+  );
 };
 
 const renderGoalCard = (goal: GoalRecord) => {
@@ -69,25 +97,7 @@ const renderGoalCard = (goal: GoalRecord) => {
       aria-label={`פתיחת היעד ${goal.title}`}
       className="flex items-center gap-3 rounded-[16px] bg-[#f6f0eb] p-3 shadow-[inset_0_0_0_1px_rgba(96,65,52,0.06)]"
     >
-      {goal.type === "streak" ? (
-        <div
-          className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-[#F0997B] text-[20px]"
-          aria-label={`${goal.current_streak} ימים ברצף`}
-        >
-          🔥
-        </div>
-      ) : (
-        <div
-          className="relative flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full"
-          style={{
-            background: `conic-gradient(#D85A30 0% ${percent}%, #F5EEE8 ${percent}% 100%)`,
-          }}
-        >
-          <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#f6f0eb] text-[10px] font-medium text-[#D85A30]">
-            {percent}%
-          </div>
-        </div>
-      )}
+      {renderGoalIcon(goal, percent)}
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-medium text-[#2d120b]">{goal.title}</p>
         <p className="mt-1 text-[12px] text-[#6b5346]">{progressText}</p>
@@ -100,19 +110,19 @@ const renderGoalCard = (goal: GoalRecord) => {
 export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenProps) {
   const totalPoints = profile?.total_points ?? 0;
   const longestStreak = goals.reduce((max, goal) => Math.max(max, goal.current_streak), 0);
-  const primaryGoal = goals[0];
+  const displayName = profile?.display_name?.trim() || "משתמש";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f4efe9] p-5">
       <div className="w-full max-w-[420px] rounded-[30px] border border-[#e8d7cd] bg-[#fffaf6] p-4 shadow-[0_20px_50px_rgba(86,45,23,0.08)]" dir="rtl">
         <div className="mb-5 flex items-center justify-between gap-3">
-            <p className="text-[20px] font-medium text-[#2d120b]">היי {profile?.display_name ?? "משתמש"}</p>
-          <span className="text-[12px] text-[#6b5346]">כל צעד נחשב</span>
-        </div>
-
-        <div className="mb-5 flex items-center justify-between rounded-[12px] bg-[#FAC775] px-3 py-2 text-[#412402]">
-          <span className="text-[12px]">נקודות</span>
-          <span className="text-[13px] font-medium">{totalPoints}</span>
+          <p className="text-[20px] font-medium text-[#2d120b]">היי {displayName} 👋</p>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FAC775] py-1 pr-1 pl-2.5">
+            <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-[#EF9F27]">
+              <IconBolt size={10} className="text-[#412402]" />
+            </span>
+            <span className="text-[11px] font-medium text-[#412402]">{totalPoints}</span>
+          </span>
         </div>
 
         <div className="mb-5 rounded-[20px] bg-[#F0997B] p-4 text-[#4A1B0C]">
@@ -141,16 +151,6 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
           <IconPlus size={18} aria-hidden="true" />
           יעד חדש
         </Link>
-
-        {primaryGoal && (
-          <div className="mt-5 rounded-[16px] border border-[#f0dfd4] bg-[#fff8f3] p-3">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-[12px] text-[#6b5346]">יעד מוביל</span>
-              <span className="text-[11px] font-medium text-[#BA7517]">{goalBadge(primaryGoal)}</span>
-            </div>
-            <p className="text-[14px] font-medium text-[#2d120b]">{primaryGoal.title}</p>
-          </div>
-        )}
       </div>
     </main>
   );
