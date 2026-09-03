@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardScreen } from "@/components/dashboard-screen";
 import { getCurrentUser } from "@/lib/auth";
-import { getGoals, getLatestProgressEntries, getProfile } from "@/lib/database";
+import { getGoals, getProfile } from "@/lib/database";
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
 
 export default function DashboardPage() {
@@ -28,10 +28,6 @@ export default function DashboardPage() {
         getProfile(user.id),
         getGoals(user.id),
       ]);
-      const latestProgressEntries = await getLatestProgressEntries(
-        goalsData.map((goal) => goal.id)
-      );
-
       if (!isMounted) return;
 
       setProfile(
@@ -57,9 +53,7 @@ export default function DashboardPage() {
           created_at: goal.created_at,
           completed_at: goal.completed_at ?? null,
           details: goal.details ?? {},
-          current_value: Number(
-            latestProgressEntries.get(goal.id)?.value ?? goal.details?.start_value ?? 0
-          ),
+          current_value: Number(goal.current_value ?? goal.details?.start_value ?? 0),
           is_completed: goal.status === "completed",
         }))
       );

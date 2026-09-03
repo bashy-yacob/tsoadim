@@ -20,9 +20,9 @@ const goalProgress = (goal: GoalRecord) => {
   if (goal.type === "quantitative") {
     const start = Number(goal.details?.start_value ?? 0);
     const target = Number(goal.details?.target_value ?? 0);
-    const current = Number(goal.current_value ?? 0);
+    const current = Number(goal.current_value ?? start);
     if (!target) return 0;
-    return Math.min(100, Math.max(0, ((current - start) / (target - start || 1)) * 100));
+    return Math.min(100, Math.max(0, (current / (target || 1)) * 100));
   }
 
   if (goal.type === "streak") {

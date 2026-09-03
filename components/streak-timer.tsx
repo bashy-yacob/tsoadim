@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconRestore } from "@tabler/icons-react";
 import { addProgressEntry } from "@/lib/database";
 
 type StreakTimerProps = {
   goalId: string;
+  goalTitle: string;
+  currentStreak: number;
   durationMinutes: number;
   onCompleted?: () => void;
 };
 
-export function StreakTimer({ goalId, durationMinutes, onCompleted }: StreakTimerProps) {
+export function StreakTimer({ goalId, goalTitle, currentStreak, durationMinutes, onCompleted }: StreakTimerProps) {
   const totalSeconds = Math.max(1, Math.round(durationMinutes * 60));
   const storageKey = `streak-timer:${goalId}`;
   const getSavedTimer = () => {
@@ -113,6 +116,7 @@ export function StreakTimer({ goalId, durationMinutes, onCompleted }: StreakTime
   const minutes = Math.floor(secondsLeft / 60).toString().padStart(2, "0");
   const seconds = (secondsLeft % 60).toString().padStart(2, "0");
   const progressPercent = Math.round(((totalSeconds - secondsLeft) / totalSeconds) * 100);
+  const actionLabel = `התחל ${goalTitle}`;
 
   const reset = () => {
     setSecondsLeft(totalSeconds);
@@ -135,32 +139,53 @@ export function StreakTimer({ goalId, durationMinutes, onCompleted }: StreakTime
     setIsRunning(true);
   };
 
+  const stop = () => {
+    setIsRunning(false);
+    setEndAt(null);
+  };
+
   return (
     <section className="mb-5 rounded-[16px] bg-[#fff6f1] p-4">
-      <p className="mb-2 text-[13px] font-medium text-[#6b5346]">טיימר לאימון</p>
-      <div className="mb-3 text-center text-[34px] font-medium tracking-[2px] text-[#2d120b]">
-        {minutes}:{seconds}
+      <p className="mb-3 text-[13px] font-medium text-[#6b5346]">טיימר לאימון</p>
+      <div className="relative mx-auto mb-4 flex h-[208px] w-[208px] items-center justify-center rounded-full" style={{ background: `conic-gradient(#D85A30 0% ${progressPercent}%, #F0E6DF ${progressPercent}% 100%)` }}>
+        <div className="flex h-[178px] w-[178px] flex-col items-center justify-center rounded-full bg-[#fff6f1]">
+          <span className="text-[36px] font-medium tracking-[2px] text-[#2d120b]">{minutes}:{seconds}</span>
+          <span className="mt-1 text-[12px] text-[#6b5346]">מתוך {durationMinutes} דקות</span>
+        </div>
       </div>
-      <div className="mb-3 h-[7px] overflow-hidden rounded-full bg-[#f0dfd5]">
-        <div className="h-full rounded-full bg-[#D85A30] transition-[width]" style={{ width: `${progressPercent}%` }} />
-      </div>
-      <p className="mb-3 text-center text-[12px] text-[#6b5346]">עוד צעד קטן: {progressPercent}%</p>
-      <div className="flex gap-2">
+      <p className="mb-4 rounded-[12px] bg-[#f4f0eb] px-3 py-3 text-center text-[12px] leading-5 text-[#4a1b0c]">
+        רצף של {currentStreak} ימים · השלמת {goalTitle} תעלה אותו אוטומטית
+      </p>
+      <div className="flex items-center justify-center gap-3" dir="ltr">
+        <button
+          type="button"
+          onClick={stop}
+          disabled={isSaving || !isRunning}
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-[#e5ddd5] bg-[#f7f3ee] text-[#6b5346] shadow-sm disabled:opacity-40"
+          aria-label="עצור"
+          title="עצור"
+        >
+          <IconPlayerStop size={20} />
+        </button>
         <button
           type="button"
           onClick={toggleRunning}
           disabled={isSaving || secondsLeft === 0}
-          className="flex-1 rounded-[10px] bg-[#D85A30] px-3 py-2 text-[13px] font-medium text-white disabled:opacity-50"
+          className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#D85A30] text-white shadow-[0_8px_18px_rgba(216,90,48,0.2)] disabled:opacity-50"
+          aria-label={isRunning ? "השהה" : actionLabel}
+          title={isRunning ? "השהה" : actionLabel}
         >
-          {isRunning ? "השהה" : "התחל לצעוד"}
+          {isRunning ? <IconPlayerPause size={24} /> : <IconPlayerPlay size={24} />}
         </button>
         <button
           type="button"
           onClick={reset}
           disabled={isSaving}
-          className="rounded-[10px] bg-[#f0dfd5] px-3 py-2 text-[13px] font-medium text-[#2d120b] disabled:opacity-50"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-[#e5ddd5] bg-[#f7f3ee] text-[#6b5346] shadow-sm disabled:opacity-50"
+          aria-label="אתחל"
+          title="אתחל"
         >
-          התחלה מחדש
+          <IconRestore size={20} />
         </button>
       </div>
       {message && <p className="mt-2 text-center text-[12px] text-[#6b5346]">{message}</p>}

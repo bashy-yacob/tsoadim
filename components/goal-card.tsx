@@ -13,7 +13,7 @@ export function GoalCard({ goal }: GoalCardProps) {
     if (goal.type === "quantitative") {
       const start = goal.details.start_value || 0;
       const target = goal.details.target_value || 100;
-      const current = Number(goal.details.start_value ?? 0);
+      const current = Number(goal.current_value ?? start);
       return Math.min(100, Math.max(0, ((current - start) / (target - start || 1)) * 100));
     } else if (goal.type === "streak") {
       return (goal.current_streak / (goal.details.target_per_week || 7)) * 100;
@@ -66,7 +66,7 @@ export function GoalCard({ goal }: GoalCardProps) {
 
   const getProgressInfo = () => {
     if (goal.type === "quantitative") {
-      const current = goal.details.start_value || 0;
+      const current = goal.current_value ?? goal.details.start_value ?? 0;
       const target = goal.details.target_value || 100;
       const unit = goal.details.unit || "";
       return `${current}/${target} ${unit}`;

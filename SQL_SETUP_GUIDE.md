@@ -34,7 +34,23 @@ Copy and paste the entire rls_policies.sql content from `../חומרים לאפ�
 - Prevent unauthorized data access
 - Allow only self-service profile updates
 - Protect subscription table from client writes (webhook only)
-- Enable leaderboard views with opt-in controls
+- Enable leaderboard RPCs with opt-in and group-membership controls
+
+The policy script also restricts direct profile reads to the signed-in user.
+Leaderboard profile data is returned only through the secured RPC functions.
+
+### Step 3.1: Allow Multiple Quantitative Updates Per Day
+If the database was created from an older version of the schema, run
+`../חומרים לאפליקציית מעקב אישי/allow_multiple_quantitative_entries.sql` once.
+This removes the old uniqueness rule for `(goal_id, entry_date)`. It does not
+remove the application-level one-entry-per-day rule for daily streak goals.
+
+### Step 3.2: Maintain Accumulated Goal Values
+For an existing database, run
+`../חומרים לאפליקציית מעקב אישי/add_current_value_trigger.sql` once.
+This adds `goals.current_value`, recalculates existing goals from their
+progress entries, and keeps the value updated after new, edited, or deleted
+progress entries.
 
 ### Step 4: Enable Auth Providers
 In Supabase Dashboard:
@@ -61,6 +77,21 @@ order by tablename;
 ```
 
 Expected output: All 7 tables listed, all with rowsecurity = true
+
+Also verify that the RPC functions exist:
+
+```sql
+select routine_name
+from information_schema.routines
+where routine_schema = 'public'
+   and routine_name in ('get_global_leaderboard', 'get_group_leaderboard');
+```
+
+Security checks:
+- A signed-in user must not be able to select another user's row from `profiles`.
+- A user who is not opted in must not appear in `get_global_leaderboard`.
+- A user who is not a member of a group must receive no rows from `get_group_leaderboard`.
+- Do not run the SQL policy script with a client key; execute it in the Supabase SQL Editor.
 
 ### Step 6: Create Seed Data (for testing)
 Run this in SQL Editor with your test user ID (get from Auth tab):

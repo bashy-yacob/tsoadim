@@ -31,6 +31,7 @@ create table goals (
   -- milestone: { "due_date": "2026-06-01" }
   details jsonb not null default '{}',
   -- שדה שמור לחישוב סטריק - מתעדכן ע"י job יומי, לא real-time
+  current_value numeric not null default 0,
   current_streak int not null default 0,
   longest_streak int not null default 0,
   status text not null default 'active', -- active | completed | archived
@@ -48,7 +49,7 @@ create table progress_entries (
   value numeric, -- לערכים כמותיים; יכול להיות NULL עבור סימון "בוצע היום" בסטריק
   entry_date date not null default current_date,
   note text,
-  created_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
   -- יעד כמותי יכול לקבל כמה עדכונים ביום.
   -- יעד סטריק יומי נאכף באפליקציה: עדכון אחד לכל יום.
 );

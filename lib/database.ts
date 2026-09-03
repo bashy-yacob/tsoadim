@@ -60,6 +60,19 @@ export type Subscription = {
   updated_at: string;
 };
 
+function shiftDate(date: string, days: number): string {
+  const shifted = new Date(`${date}T00:00:00Z`);
+  shifted.setUTCDate(shifted.getUTCDate() + days);
+  return shifted.toISOString().split("T")[0];
+}
+
+function getWeekStart(date: string): string {
+  const value = new Date(`${date}T00:00:00Z`);
+  const day = value.getUTCDay();
+  value.setUTCDate(value.getUTCDate() - (day === 0 ? 6 : day - 1));
+  return value.toISOString().split("T")[0];
+}
+
 /**
  * PROFILE OPERATIONS
  */
@@ -161,16 +174,19 @@ export async function getGoals(userId: string): Promise<Goal[]> {
     return goals;
   }
 
-  const latestValues = new Map<string, number>();
+  const progressTotals = new Map<string, number>();
   for (const entry of (progressEntries ?? []) as Array<{ goal_id: string; value: number | null }>) {
-    if (!latestValues.has(entry.goal_id)) {
-      latestValues.set(entry.goal_id, Number(entry.value ?? 0));
-    }
+    progressTotals.set(
+      entry.goal_id,
+      (progressTotals.get(entry.goal_id) ?? 0) + Number(entry.value ?? 0)
+    );
   }
 
   return goals.map((goal) => ({
     ...goal,
-    current_value: latestValues.get(goal.id) ?? Number(goal.details?.start_value ?? 0),
+    current_value: goal.type === "quantitative"
+      ? Number(goal.current_value ?? Number(goal.details?.start_value ?? 0) + (progressTotals.get(goal.id) ?? 0))
+      : Number(goal.details?.start_value ?? 0),
   }));
 }
 
@@ -207,6 +223,7 @@ export async function createGoal(
       title,
       type,
       details,
+      current_value: type === "quantitative" ? Number(details.start_value ?? 0) : 0,
       category: category || null,
       status: "active",
     })
@@ -315,20 +332,37 @@ export async function addProgressEntry(
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return null;
 
-  const [{ data: goal, error: goalError }, { data: existingEntry, error: existingEntryError }, { data: profile, error: profileError }] = await Promise.all([
-    (supabase.from("goals") as any).select("id, user_id, type, details, current_streak, longest_streak, status").eq("id", goalId).single(),
-    (supabase.from("progress_entries") as any).select("id").eq("goal_id", goalId).eq("entry_date", entryDate).maybeSingle(),
-    (supabase.from("profiles") as any).select("total_points").eq("id", (await supabase.auth.getUser()).data.user?.id ?? "").maybeSingle(),
-  ]);
+  const { data: goal, error: goalError } = await (supabase.from("goals") as any)
+    .select("id, user_id, type, details, current_streak, longest_streak, status")
+    .eq("id", goalId)
+    .single();
+  const { data: profile, error: profileError } = await (supabase.from("profiles") as any)
+    .select("total_points")
+    .eq("id", goal?.user_id ?? "")
+    .maybeSingle();
 
-  if (goalError || existingEntryError || profileError || !goal) {
-    console.error("Error preparing progress entry:", goalError || existingEntryError || profileError);
+  if (goalError || profileError || !goal) {
+    console.error("Error preparing progress entry:", goalError || profileError);
     return null;
   }
 
   const isDailyStreak = goal.type === "streak" && goal.details?.frequency !== "weekly";
-  if (isDailyStreak && existingEntry) {
-    return null;
+  let existingEntry: { id: string } | null = null;
+
+  if (isDailyStreak) {
+    const { data: existingEntryData, error: existingEntryError } = await (supabase.from("progress_entries") as any)
+      .select("id")
+      .eq("goal_id", goalId)
+      .eq("entry_date", entryDate)
+      .maybeSingle();
+
+    if (existingEntryError) {
+      console.error("Error checking daily progress:", existingEntryError);
+      return null;
+    }
+
+    existingEntry = existingEntryData;
+    if (existingEntry) return null;
   }
 
   const { data, error } = await (supabase.from("progress_entries") as any)
@@ -358,13 +392,30 @@ export async function addProgressEntry(
     }
 
     if (goal.type === "streak") {
-      const entryDates = new Set((entries ?? []).map((entry: { entry_date: string }) => entry.entry_date));
+      const entryDates: Set<string> = new Set(
+        (entries ?? []).map((entry: { entry_date: unknown }) => String(entry.entry_date)) as string[]
+      );
       let currentStreak = 0;
-      const date = new Date(`${entryDate}T00:00:00Z`);
 
-      while (entryDates.has(date.toISOString().split("T")[0])) {
-        currentStreak += 1;
-        date.setUTCDate(date.getUTCDate() - 1);
+      if (goal.details?.frequency === "weekly") {
+        const targetPerWeek = Math.max(1, Number(goal.details?.target_per_week ?? 1));
+        const entriesPerWeek = new Map<string, number>();
+        for (const date of entryDates) {
+          const weekStart = getWeekStart(date);
+          entriesPerWeek.set(weekStart, (entriesPerWeek.get(weekStart) ?? 0) + 1);
+        }
+
+        let week = getWeekStart(entryDate);
+        while ((entriesPerWeek.get(week) ?? 0) >= targetPerWeek) {
+          currentStreak += 1;
+          week = shiftDate(week, -7);
+        }
+      } else {
+        const date = new Date(`${entryDate}T00:00:00Z`);
+        while (entryDates.has(date.toISOString().split("T")[0])) {
+          currentStreak += 1;
+          date.setUTCDate(date.getUTCDate() - 1);
+        }
       }
 
       const longestStreak = Math.max(Number(goal.longest_streak ?? 0), currentStreak);
@@ -379,7 +430,9 @@ export async function addProgressEntry(
 
     const points = goal.type === "milestone"
       ? XP_VALUES.MILESTONE_COMPLETION
-      : calculateXPForEntry(goal as Goal, data as ProgressEntry);
+      : goal.type === "streak" && goal.details?.frequency === "weekly"
+        ? XP_VALUES.STREAK_WEEKLY
+        : calculateXPForEntry(goal as Goal, data as ProgressEntry);
 
     if (goal.type === "milestone") {
       const { error: completionError } = await (supabase.from("goals") as any)
@@ -452,7 +505,7 @@ export async function getGlobalLeaderboard(limit: number = 100): Promise<Profile
   if (!supabase) return [];
 
   const { data, error } = await (supabase.rpc as any)("get_global_leaderboard", {
-    limit_count: limit,
+    p_limit_count: limit,
   });
 
   if (error) {
@@ -471,8 +524,8 @@ export async function getGroupLeaderboard(
   if (!supabase) return [];
 
   const { data, error } = await (supabase.rpc as any)("get_group_leaderboard", {
-    group_id: groupId,
-    limit_count: limit,
+    p_group_id: groupId,
+    p_limit_count: limit,
   });
 
   if (error) {

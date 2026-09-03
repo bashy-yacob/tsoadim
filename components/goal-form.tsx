@@ -98,13 +98,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
     }
 
     if (goalType === "milestone") {
-      if (!dueDate) {
-        setError("תאריך יעד הוא חובה");
-        return false;
-      }
-
-      const selectedDate = new Date(dueDate);
-      if (Number.isNaN(selectedDate.getTime()) || selectedDate <= new Date()) {
+      if (dueDate && (Number.isNaN(new Date(dueDate).getTime()) || new Date(dueDate) <= new Date())) {
         setError("תאריך יעד חייב להיות בעתיד");
         return false;
       }
