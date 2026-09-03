@@ -41,7 +41,7 @@ export function LandingScreen() {
               <p className="mb-1 text-[12px] font-medium opacity-80">רצף נוכחי</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-[36px] font-medium">12</span>
-                <span className="text-[14px]">ימים 🔥</span>
+                <span className="inline-flex items-center gap-1 text-[14px]">ימים <IconFlame size={15} aria-hidden="true" /></span>
               </div>
             </div>
             <div className="mt-4 space-y-3">

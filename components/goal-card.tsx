@@ -1,6 +1,6 @@
 "use client";
 
-import { IconChevronLeft } from "@tabler/icons-react";
+import { IconChartBar, IconCheck, IconChevronLeft, IconFlame, IconTargetArrow } from "@tabler/icons-react";
 import Link from "next/link";
 import { Goal } from "@/lib/database";
 
@@ -26,13 +26,13 @@ export function GoalCard({ goal }: GoalCardProps) {
   const getGoalIcon = () => {
     switch (goal.type) {
       case "quantitative":
-        return "📊";
+        return <IconChartBar size={18} stroke={1.8} />;
       case "streak":
-        return "🔥";
+        return <IconFlame size={18} stroke={1.8} />;
       case "milestone":
-        return "🎯";
+        return <IconTargetArrow size={18} stroke={1.8} />;
       default:
-        return "✨";
+        return <IconTargetArrow size={18} stroke={1.8} />;
     }
   };
 
@@ -71,7 +71,7 @@ export function GoalCard({ goal }: GoalCardProps) {
       const unit = goal.details.unit || "";
       return `${current}/${target} ${unit}`;
     } else if (goal.type === "milestone") {
-      if (goal.status === "completed") return "✅ הושלם";
+      if (goal.status === "completed") return <span className="inline-flex items-center gap-1"><IconCheck size={14} /> הושלם</span>;
       const dueDate = new Date(goal.details.due_date || "");
       return dueDate.toLocaleDateString("he-IL");
     }
@@ -83,7 +83,7 @@ export function GoalCard({ goal }: GoalCardProps) {
       <div className="mb-3 flex items-start justify-between">
         <div className="flex-1">
           <div className="mb-2 flex items-center gap-2">
-            <span className="text-[18px]">{getGoalIcon()}</span>
+            <span className="text-[#D85A30]">{getGoalIcon()}</span>
             <span className="text-[11px] font-medium text-[#9C9585] uppercase">
               {getTypeLabel()}
             </span>

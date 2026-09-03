@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { IconAlertCircle, IconArrowLeft } from "@tabler/icons-react";
+import { IconAlertCircle, IconArrowLeft, IconChartBar, IconFlame, IconTargetArrow } from "@tabler/icons-react";
 import { getCurrentUser } from "@/lib/auth";
 import { createGoal, updateGoal, type GoalType } from "@/lib/database";
 import { getGoalById } from "@/lib/supabase-data";
@@ -215,9 +215,9 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
             </label>
             <div className="grid gap-3 sm:grid-cols-3">
               {[
-                { type: "quantitative", label: "כמותי", emoji: "📊" },
-                { type: "streak", label: "רצף", emoji: "🔥" },
-                { type: "milestone", label: "אבן דרך", emoji: "🎯" },
+                { type: "quantitative", label: "כמותי", icon: IconChartBar },
+                { type: "streak", label: "רצף", icon: IconFlame },
+                { type: "milestone", label: "אבן דרך", icon: IconTargetArrow },
               ].map((option) => (
                 <button
                   key={option.type}
@@ -229,7 +229,7 @@ export function GoalFormComponent({ goalId }: GoalFormProps) {
                       : "border-[#E5E1D8] bg-white hover:border-[#D85A30]"
                   }`}
                 >
-                  <div className="mb-2 text-[24px]">{option.emoji}</div>
+                  <option.icon className="mx-auto mb-2 text-[#D85A30]" size={24} stroke={1.8} />
                   <p className="text-[13px] font-medium text-[#1F1B16]">{option.label}</p>
                 </button>
               ))}

@@ -1,5 +1,6 @@
 import type { GoalRecord, ProfileRecord } from "@/types/dashboard";
 import Link from "next/link";
+import { IconFlame, IconPlus } from "@tabler/icons-react";
 
 type DashboardScreenProps = {
   profile?: ProfileRecord | null;
@@ -105,7 +106,7 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
     <main className="flex min-h-screen items-center justify-center bg-[#f4efe9] p-5">
       <div className="w-full max-w-[420px] rounded-[30px] border border-[#e8d7cd] bg-[#fffaf6] p-4 shadow-[0_20px_50px_rgba(86,45,23,0.08)]" dir="rtl">
         <div className="mb-5 flex items-center justify-between gap-3">
-          <p className="text-[20px] font-medium text-[#2d120b]">היי {profile?.display_name ?? "משתמש"} 👋</p>
+            <p className="text-[20px] font-medium text-[#2d120b]">היי {profile?.display_name ?? "משתמש"}</p>
           <span className="text-[12px] text-[#6b5346]">כל צעד נחשב</span>
         </div>
 
@@ -118,7 +119,7 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
           <p className="mb-1 text-[12px] font-medium opacity-85">רצף נוכחי</p>
           <div className="flex items-baseline gap-2">
             <span className="text-[40px] font-medium">{longestStreak || 0}</span>
-            <span className="text-[15px]">ימים ברצף 🔥</span>
+            <span className="inline-flex items-center gap-1 text-[15px]">ימים ברצף <IconFlame size={17} aria-hidden="true" /></span>
           </div>
         </div>
 
@@ -137,7 +138,7 @@ export function DashboardScreen({ profile = null, goals = [] }: DashboardScreenP
         )}
 
         <Link href="/goals/new" className="mt-5 flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#D85A30] px-4 py-[14px] text-[14px] font-medium text-[#FAECE7] shadow-[0_8px_18px_rgba(216,90,48,0.2)]">
-          <span className="text-[18px]">＋</span>
+          <IconPlus size={18} aria-hidden="true" />
           יעד חדש
         </Link>
 
